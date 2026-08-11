@@ -3,7 +3,7 @@
 Личная фильмотека для macOS. Хранит фильмы, оценки, статусы, жанры и обложки
 локально на вашем Mac — без регистрации и облачного сервиса.
 
-[Скачать My Movies 0.2.0 (.dmg)](https://github.com/vehxi/MyMovies/releases/download/v0.2.0/MyMovies-0.2.0.dmg)
+[Скачать My Movies 0.3.0 (.dmg)](https://github.com/vehxi/MyMovies/releases/download/v0.3.0/MyMovies-0.3.0.dmg)
 
 Требуется macOS 26 Tahoe или новее. Приложение работает на Mac с Apple Silicon
 и Intel.

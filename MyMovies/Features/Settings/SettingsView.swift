@@ -13,6 +13,6 @@ struct SettingsView: View {
                     Label("Genres", systemImage: "tag")
                 }
         }
-        .frame(width: 560, height: 440)
+        .frame(width: 640, height: 520)
     }
 }

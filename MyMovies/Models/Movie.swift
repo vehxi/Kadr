@@ -8,7 +8,9 @@ final class Movie {
     @Attribute(.unique) var id: UUID
     var title: String
     var normalizedTitle: String
+    var mediaKindRawValue: String = MediaKind.movie.rawValue
     var releaseYear: Int?
+    var releaseEndYear: Int? = nil
     var statusRawValue: String
     var favoriteFlag: Bool = false
     var rating: Int?
@@ -21,10 +23,15 @@ final class Movie {
     @Relationship(deleteRule: .nullify, inverse: \Genre.movies)
     var genres: [Genre]
 
+    @Relationship(deleteRule: .cascade, inverse: \SeriesSeason.movie)
+    var seasons: [SeriesSeason]
+
     init(
         id: UUID = UUID(),
         title: String,
+        mediaKind: MediaKind = .movie,
         releaseYear: Int? = nil,
+        releaseEndYear: Int? = nil,
         status: ViewingStatus = .wantToWatch,
         isFavorite: Bool = false,
         rating: Int? = nil,
@@ -33,12 +40,19 @@ final class Movie {
         tier: MovieTier? = nil,
         createdAt: Date = .now,
         updatedAt: Date = .now,
-        genres: [Genre] = []
+        genres: [Genre] = [],
+        seasons: [SeriesSeason] = []
     ) {
         self.id = id
         self.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         self.normalizedTitle = TextNormalizer.normalize(title)
+        self.mediaKindRawValue = mediaKind.rawValue
         self.releaseYear = releaseYear
+        self.releaseEndYear = Self.normalizedEndYear(
+            releaseEndYear,
+            startingAt: releaseYear,
+            mediaKind: mediaKind
+        )
         self.statusRawValue = status.rawValue
         self.favoriteFlag = isFavorite
         self.rating = RatingRules.validated(rating, for: status)
@@ -48,6 +62,42 @@ final class Movie {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.genres = genres
+        self.seasons = seasons
+    }
+
+    var mediaKind: MediaKind {
+        get { MediaKind(rawValue: mediaKindRawValue) ?? .movie }
+        set {
+            mediaKindRawValue = newValue.rawValue
+            if newValue == .series {
+                tier = nil
+            } else {
+                releaseEndYear = nil
+            }
+        }
+    }
+
+    var releasePeriodText: String? {
+        guard let releaseYear else { return nil }
+        guard mediaKind == .series,
+              let releaseEndYear,
+              releaseEndYear != releaseYear
+        else {
+            return String(releaseYear)
+        }
+        return "\(releaseYear)–\(releaseEndYear)"
+    }
+
+    var sortedSeasons: [SeriesSeason] {
+        seasons.sorted { $0.number < $1.number }
+    }
+
+    var episodeCount: Int {
+        seasons.reduce(0) { $0 + $1.episodes.count }
+    }
+
+    var watchedEpisodeCount: Int {
+        seasons.reduce(0) { $0 + $1.watchedEpisodeCount }
     }
 
     var status: ViewingStatus {
@@ -91,7 +141,9 @@ final class Movie {
 
     func update(
         title: String,
+        mediaKind: MediaKind,
         releaseYear: Int?,
+        releaseEndYear: Int?,
         status: ViewingStatus,
         isFavorite: Bool,
         rating: Int?,
@@ -102,7 +154,13 @@ final class Movie {
     ) {
         self.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         normalizedTitle = TextNormalizer.normalize(title)
+        self.mediaKind = mediaKind
         self.releaseYear = releaseYear
+        self.releaseEndYear = Self.normalizedEndYear(
+            releaseEndYear,
+            startingAt: releaseYear,
+            mediaKind: mediaKind
+        )
         statusRawValue = status.rawValue
         favoriteFlag = isFavorite
         self.rating = RatingRules.validated(rating, for: status)
@@ -110,5 +168,14 @@ final class Movie {
         self.coverFilename = coverFilename
         self.genres = genres
         updatedAt = now
+    }
+
+    private static func normalizedEndYear(
+        _ endYear: Int?,
+        startingAt startYear: Int?,
+        mediaKind: MediaKind
+    ) -> Int? {
+        guard mediaKind == .series, let startYear else { return nil }
+        return max(endYear ?? startYear, startYear)
     }
 }

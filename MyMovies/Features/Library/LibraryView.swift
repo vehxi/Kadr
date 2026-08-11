@@ -12,7 +12,7 @@ struct LibraryView: View {
     @State private var startupError: String?
 
     private let grid = [
-        GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 28)
+        GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 28, alignment: .top)
     ]
 
     var body: some View {
@@ -28,20 +28,23 @@ struct LibraryView: View {
                         Button {
                             presentAddMovie()
                         } label: {
-                            Label("Add Movie", systemImage: "plus")
+                            Label("Add Title", systemImage: "plus")
                         }
                         .keyboardShortcut("n", modifiers: .command)
-                        .help("Add Movie")
+                        .help("Add Title")
                     }
                 }
         }
         .sheet(item: $presentedSheet) { sheet in
-            switch sheet.content {
-            case .add:
-                MovieEditorView()
-            case .detail(let movie):
-                MovieDetailView(movie: movie)
+            Group {
+                switch sheet.content {
+                case .add:
+                    MovieEditorView()
+                case .detail(let movie):
+                    MovieDetailView(movie: movie)
+                }
             }
+            .environment(\.locale, locale)
         }
         .onReceive(NotificationCenter.default.publisher(for: .newMovieRequested)) { _ in
             presentAddMovie()
@@ -63,49 +66,70 @@ struct LibraryView: View {
     }
 
     private var sidebar: some View {
-        List(selection: $selection) {
-            Label {
-                sidebarLabel("All Movies", count: movies.count)
-            } icon: {
-                Image(systemName: "film.stack")
-            }
-            .tag(LibraryFilter.all)
+        VStack(spacing: 0) {
+            List(selection: $selection) {
+                Label {
+                    sidebarLabel("All Titles", count: movies.count)
+                } icon: {
+                    Image(systemName: "rectangle.stack")
+                }
+                .tag(LibraryFilter.all)
 
-            Label {
-                sidebarLabel("Favorite", count: favoriteCount)
-            } icon: {
-                Image(systemName: "heart.fill")
-            }
-            .tag(LibraryFilter.favorites)
+                Label {
+                    sidebarLabel("Movies", count: movieCount)
+                } icon: {
+                    Image(systemName: MediaKind.movie.systemImage)
+                }
+                .tag(LibraryFilter.movies)
 
-            Label("Tier List", systemImage: "square.grid.3x3.square")
-                .tag(LibraryFilter.tierList)
+                Label {
+                    sidebarLabel("Series", count: seriesCount)
+                } icon: {
+                    Image(systemName: MediaKind.series.systemImage)
+                }
+                .tag(LibraryFilter.series)
 
-            Section("Status") {
-                ForEach(ViewingStatus.allCases) { status in
-                    Label {
-                        HStack {
-                            Text(status.titleKey)
-                            Spacer()
-                            Text(statusCount(status), format: .number)
-                                .foregroundStyle(.secondary)
-                                .monospacedDigit()
+                Label {
+                    sidebarLabel("Favorite", count: favoriteCount)
+                } icon: {
+                    Image(systemName: "heart.fill")
+                }
+                .tag(LibraryFilter.favorites)
+
+                Label("Tier List", systemImage: "square.grid.3x3.square")
+                    .tag(LibraryFilter.tierList)
+
+                Section("Status") {
+                    ForEach(ViewingStatus.allCases) { status in
+                        Label {
+                            HStack {
+                                Text(status.titleKey)
+                                Spacer()
+                                Text(statusCount(status), format: .number)
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
+                        } icon: {
+                            Image(systemName: status.systemImage)
                         }
-                    } icon: {
-                        Image(systemName: status.systemImage)
+                        .tag(LibraryFilter.status(status))
                     }
-                    .tag(LibraryFilter.status(status))
                 }
             }
+            .listStyle(.sidebar)
+
+            Divider()
+
+            SidebarSettingsLink()
+                .padding(8)
         }
-        .listStyle(.sidebar)
-        .navigationTitle("My Movies")
+        .navigationTitle("My Library")
     }
 
     @ViewBuilder
     private var content: some View {
         if selection == .tierList {
-            TierListView(movies: movies) { movie in
+            TierListView(movies: movies.filter { $0.mediaKind == .movie }) { movie in
                 presentedSheet = MovieSheet(content: .detail(movie))
             }
         } else if filteredMovies.isEmpty {
@@ -114,7 +138,7 @@ struct LibraryView: View {
             } description: {
                 Text(emptyDescription)
             } actions: {
-                Button("Add Movie") {
+                Button("Add Title") {
                     presentAddMovie()
                 }
                 .buttonStyle(.borderedProminent)
@@ -135,8 +159,12 @@ struct LibraryView: View {
 
     private var filteredMovies: [Movie] {
         switch selection ?? .all {
-        case .all, .tierList:
+        case .all:
             return movies
+        case .movies, .tierList:
+            return movies.filter { $0.mediaKind == .movie }
+        case .series:
+            return movies.filter { $0.mediaKind == .series }
         case .favorites:
             return movies.filter(\.isFavorite)
         case .status(let status):
@@ -147,7 +175,11 @@ struct LibraryView: View {
     private var selectionTitle: String {
         switch selection ?? .all {
         case .all:
-            AppLocalization.string("All Movies", locale: locale)
+            AppLocalization.string("All Titles", locale: locale)
+        case .movies:
+            AppLocalization.string("Movies", locale: locale)
+        case .series:
+            AppLocalization.string("Series", locale: locale)
         case .favorites:
             AppLocalization.string("Favorite", locale: locale)
         case .tierList:
@@ -158,13 +190,13 @@ struct LibraryView: View {
     }
 
     private var emptyTitle: LocalizedStringKey {
-        selection == .all ? "Your Library Is Empty" : "No Movies Here"
+        selection == .all ? "Your Library Is Empty" : "No Titles Here"
     }
 
     private var emptyDescription: LocalizedStringKey {
         selection == .all
-            ? "Add your first movie to start a personal collection."
-            : "Movies with this status will appear here."
+            ? "Add your first movie or series to start a personal collection."
+            : "Titles matching this filter will appear here."
     }
 
     private var emptySystemImage: String {
@@ -186,6 +218,14 @@ struct LibraryView: View {
         movies.lazy.filter(\.isFavorite).count
     }
 
+    private var movieCount: Int {
+        movies.lazy.filter { $0.mediaKind == .movie }.count
+    }
+
+    private var seriesCount: Int {
+        movies.lazy.filter { $0.mediaKind == .series }.count
+    }
+
     private func sidebarLabel(_ title: LocalizedStringKey, count: Int) -> some View {
         HStack {
             Text(title)
@@ -198,5 +238,36 @@ struct LibraryView: View {
 
     private func presentAddMovie() {
         presentedSheet = MovieSheet(content: .add)
+    }
+}
+
+private struct SidebarSettingsLink: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isHovering = false
+
+    var body: some View {
+        SettingsLink {
+            Label("Settings", systemImage: "gearshape")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+                .frame(height: 36)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .background(
+            Color.primary.opacity(isHovering ? 0.09 : 0.045),
+            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+        )
+        .shadow(
+            color: .black.opacity(isHovering ? 0.13 : 0.06),
+            radius: isHovering ? 5 : 2,
+            y: isHovering ? 3 : 1
+        )
+        .scaleEffect(isHovering && !reduceMotion ? 1.015 : 1)
+        .animation(
+            reduceMotion ? nil : .easeOut(duration: 0.16),
+            value: isHovering
+        )
+        .onHover { isHovering = $0 }
     }
 }

@@ -6,6 +6,8 @@ struct GenreManagementRow: View {
     let onDelete: () -> Void
 
     @State private var name: String
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isHovering = false
 
     init(
         genre: Genre,
@@ -20,6 +22,12 @@ struct GenreManagementRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            Image(systemName: "tag.fill")
+                .foregroundStyle(.tint)
+                .frame(width: 28, height: 28)
+                .background(Color.accentColor.opacity(0.12), in: Circle())
+                .accessibilityHidden(true)
+
             TextField("Genre Name", text: $name)
                 .onSubmit {
                     onRename(name)
@@ -49,6 +57,22 @@ struct GenreManagementRow: View {
             .buttonStyle(.borderless)
             .accessibilityLabel("Delete Genre")
         }
-        .padding(.vertical, 3)
+        .padding(.horizontal, 14)
+        .frame(minHeight: 52)
+        .background(
+            Color(nsColor: .controlBackgroundColor),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+        )
+        .shadow(
+            color: .black.opacity(isHovering ? 0.14 : 0.07),
+            radius: isHovering ? 7 : 3,
+            y: isHovering ? 4 : 2
+        )
+        .scaleEffect(isHovering && !reduceMotion ? 1.01 : 1)
+        .animation(
+            reduceMotion ? nil : .easeOut(duration: 0.16),
+            value: isHovering
+        )
+        .onHover { isHovering = $0 }
     }
 }

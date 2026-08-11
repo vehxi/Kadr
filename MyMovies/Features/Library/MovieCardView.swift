@@ -10,7 +10,11 @@ struct MovieCardView: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 8) {
-                PosterArtwork(title: movie.title, filename: movie.coverFilename)
+                PosterArtwork(
+                    title: movie.title,
+                    filename: movie.coverFilename,
+                    mediaKind: movie.mediaKind
+                )
                     .aspectRatio(2 / 3, contentMode: .fit)
                     .shadow(
                         color: .black.opacity(isHovering ? 0.20 : 0.12),
@@ -41,11 +45,20 @@ struct MovieCardView: View {
                 Text(movie.title)
                     .font(.headline)
                     .foregroundStyle(.primary)
-                    .lineLimit(2)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 HStack(spacing: 6) {
-                    if let year = movie.releaseYear {
-                        Text(year, format: .number.grouping(.never))
+                    if let releasePeriodText = movie.releasePeriodText {
+                        Text(releasePeriodText)
+                    }
+                    if movie.mediaKind == .series {
+                        Label(
+                            "\(movie.watchedEpisodeCount)/\(movie.episodeCount)",
+                            systemImage: "checkmark.circle"
+                        )
+                        .labelStyle(.titleAndIcon)
                     }
                     if movie.rating != nil {
                         Label("\(movie.rating ?? 0)", systemImage: "star.fill")
@@ -72,8 +85,11 @@ struct MovieCardView: View {
 
     private var accessibilityDescription: Text {
         var description = movie.title
-        if let year = movie.releaseYear {
-            description += ", \(year)"
+        if let releasePeriodText = movie.releasePeriodText {
+            description += ", \(releasePeriodText)"
+        }
+        if movie.mediaKind == .series {
+            description += ", \(String(localized: "Series")), \(movie.watchedEpisodeCount) of \(movie.episodeCount) episodes watched"
         }
         if movie.isFavorite {
             description += ", \(String(localized: "Favorite"))"

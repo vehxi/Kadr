@@ -15,7 +15,8 @@ struct StarRating: View {
                         .foregroundStyle(value <= (rating ?? 0) ? .yellow : .secondary)
                 }
                 .buttonStyle(.plain)
-                .frame(width: 28, height: 28)
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
                 .disabled(!isEnabled)
                 .accessibilityLabel(Text("\(value) stars"))
                 .accessibilityAddTraits(rating == value ? .isSelected : [])
@@ -29,7 +30,8 @@ struct StarRating: View {
                         .foregroundStyle(.tertiary)
                 }
                 .buttonStyle(.plain)
-                .frame(width: 28, height: 28)
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
                 .disabled(!isEnabled)
                 .accessibilityLabel("Clear Rating")
             }

@@ -10,35 +10,45 @@ struct GenreSettingsView: View {
     @State private var message: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                TextField("New Genre", text: $newGenreName)
-                    .onSubmit(addGenre)
-                Button("Add", action: addGenre)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(TextNormalizer.displayName(newGenreName).isEmpty)
-            }
-            .padding(16)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                SettingsSectionTitle("Genres", systemImage: "tag")
 
-            Divider()
+                SettingsSurface(isInteractive: true) {
+                    HStack(spacing: 12) {
+                        SettingsIcon(systemImage: "plus")
 
-            if genres.isEmpty {
-                ContentUnavailableView(
-                    "No Genres",
-                    systemImage: "tag",
-                    description: Text("Add a genre to use it in movie forms.")
-                )
-            } else {
-                List {
-                    ForEach(genres) { genre in
-                        GenreManagementRow(
-                            genre: genre,
-                            onRename: { rename(genre, to: $0) },
-                            onDelete: { genreToDelete = genre }
-                        )
+                        TextField("New Genre", text: $newGenreName)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit(addGenre)
+
+                        Button("Add", action: addGenre)
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.large)
+                            .disabled(TextNormalizer.displayName(newGenreName).isEmpty)
+                    }
+                }
+
+                if genres.isEmpty {
+                    ContentUnavailableView(
+                        "No Genres",
+                        systemImage: "tag",
+                        description: Text("Add a genre to use it in movie forms.")
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 260)
+                } else {
+                    LazyVStack(spacing: 10) {
+                        ForEach(genres) { genre in
+                            GenreManagementRow(
+                                genre: genre,
+                                onRename: { rename(genre, to: $0) },
+                                onDelete: { genreToDelete = genre }
+                            )
+                        }
                     }
                 }
             }
+            .padding(24)
         }
         .alert(
             "Delete Genre?",

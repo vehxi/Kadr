@@ -4,7 +4,9 @@ enum PersistenceController {
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
         let schema = Schema([
             Movie.self,
-            Genre.self
+            Genre.self,
+            SeriesSeason.self,
+            SeriesEpisode.self
         ])
         let configuration = ModelConfiguration(
             "MyMovies",

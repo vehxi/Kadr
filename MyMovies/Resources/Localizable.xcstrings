@@ -27,12 +27,42 @@
     "%lld" : {
 
     },
+    "%lld episodes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld серий"
+          }
+        }
+      }
+    },
     "%lld movies" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фильмов: %lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld из %2$lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld episodes watched" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Просмотрено серий: %1$lld из %2$lld"
           }
         }
       }
@@ -47,6 +77,19 @@
         }
       }
     },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "•" : {
+
+    },
     "A genre with this name already exists." : {
       "localizations" : {
         "ru" : {
@@ -58,11 +101,22 @@
       }
     },
     "A movie with the same title and year already exists." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фильм с таким названием и годом уже существует."
+          }
+        }
+      }
+    },
+    "A title with the same name and year already exists." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запись с таким названием и годом уже существует."
           }
         }
       }
@@ -108,6 +162,7 @@
       }
     },
     "Add Movie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -127,7 +182,21 @@
         }
       }
     },
+    "Add notes or a synopsis" : {
+
+    },
+    "Add Title" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить"
+          }
+        }
+      }
+    },
     "Add to Favorites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -137,10 +206,18 @@
         }
       }
     },
-    "Add notes or a synopsis" : {
-
+    "Add your first movie or series to start a personal collection." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте первый фильм или сериал, чтобы начать личную коллекцию."
+          }
+        }
+      }
     },
     "Add your first movie to start a personal collection." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -171,11 +248,22 @@
       }
     },
     "All Movies" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Все фильмы"
+          }
+        }
+      }
+    },
+    "All Titles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вся медиатека"
           }
         }
       }
@@ -271,6 +359,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -301,6 +390,7 @@
       }
     },
     "Could Not Save Movie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -316,6 +406,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось сохранить тир-лист"
+          }
+        }
+      }
+    },
+    "Could Not Save Title" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось сохранить"
+          }
+        }
+      }
+    },
+    "Cover" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обложка"
           }
         }
       }
@@ -381,11 +491,23 @@
       }
     },
     "Delete Movie?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить фильм?"
+          }
+        }
+      }
+    },
+    "Delete Series?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить сериал?"
           }
         }
       }
@@ -396,6 +518,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Описание"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
           }
         }
       }
@@ -451,11 +583,23 @@
       }
     },
     "Edit Movie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Редактировать фильм"
+          }
+        }
+      }
+    },
+    "Edit Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать"
           }
         }
       }
@@ -470,11 +614,35 @@
         }
       }
     },
-    "Enter a four digit year or leave blank" : {
-
+    "Enter title" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите название"
+          }
+        }
+      }
     },
-    "Enter movie title" : {
-
+    "Episode %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серия %lld"
+          }
+        }
+      }
+    },
+    "Episode Progress" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прогресс просмотра"
+          }
+        }
+      }
     },
     "Favorite" : {
       "localizations" : {
@@ -482,6 +650,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Любимое"
+          }
+        }
+      }
+    },
+    "From" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С"
           }
         }
       }
@@ -536,6 +714,38 @@
         }
       }
     },
+    "Mark All Watched" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отметить всё просмотренным"
+          }
+        }
+      }
+    },
+    "Mark Unwatched" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Снять отметки"
+          }
+        }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ещё"
+          }
+        }
+      }
+    },
     "Move to Tier" : {
       "localizations" : {
         "ru" : {
@@ -546,7 +756,18 @@
         }
       }
     },
+    "Movie" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильм"
+          }
+        }
+      }
+    },
     "Movie Cover" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -557,6 +778,7 @@
       }
     },
     "Movie Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -566,7 +788,18 @@
         }
       }
     },
+    "Movies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильмы"
+          }
+        }
+      }
+    },
     "Movies with this status will appear here." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -576,7 +809,18 @@
         }
       }
     },
+    "My Library" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моя медиатека"
+          }
+        }
+      }
+    },
     "My Movies" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -617,6 +861,7 @@
       }
     },
     "No Movies Here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -626,12 +871,33 @@
         }
       }
     },
+    "No Titles Here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь пока ничего нет"
+          }
+        }
+      }
+    },
     "Not Favorite" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не в любимом"
+          }
+        }
+      }
+    },
+    "Not Specified" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не указан"
           }
         }
       }
@@ -687,6 +953,7 @@
       }
     },
     "Rating becomes available after the movie is watched." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -696,12 +963,43 @@
         }
       }
     },
+    "Rating becomes available after the title is watched." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оценку можно поставить после просмотра."
+          }
+        }
+      }
+    },
     "Ratings are only available for watched movies. Changing the status will clear this rating." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Оценка доступна только для просмотренных фильмов. При смене статуса эта оценка будет удалена."
+          }
+        }
+      }
+    },
+    "Ratings are only available for watched titles. Changing the status will clear this rating." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оценка доступна только после просмотра. При смене статуса она будет удалена."
+          }
+        }
+      }
+    },
+    "Release Period" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Период выхода"
           }
         }
       }
@@ -726,22 +1024,23 @@
         }
       }
     },
+    "Remove from Favorites" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить из любимого"
+          }
+        }
+      }
+    },
     "Remove Rating?" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить оценку?"
-          }
-        }
-      }
-    },
-    "Remove from Favorites" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить из любимого"
           }
         }
       }
@@ -782,6 +1081,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить название жанра"
+          }
+        }
+      }
+    },
+    "Season %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезон %lld"
+          }
+        }
+      }
+    },
+    "Seasons" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезоны"
+          }
+        }
+      }
+    },
+    "Seasons and Episodes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезоны и серии"
+          }
+        }
+      }
+    },
+    "Series" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сериалы"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
           }
         }
       }
@@ -857,6 +1206,7 @@
       }
     },
     "The movie and its local cover copy will be permanently deleted." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -896,6 +1246,16 @@
         }
       }
     },
+    "This title, its viewing progress, and its local cover copy will be permanently deleted." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запись, прогресс просмотра и локальная копия обложки будут удалены безвозвратно."
+          }
+        }
+      }
+    },
     "Tier List" : {
       "localizations" : {
         "ru" : {
@@ -916,6 +1276,36 @@
         }
       }
     },
+    "Titles matching this filter will appear here." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь появятся записи, подходящие под этот фильтр."
+          }
+        }
+      }
+    },
+    "To" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По"
+          }
+        }
+      }
+    },
+    "Type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип"
+          }
+        }
+      }
+    },
     "Unranked" : {
       "localizations" : {
         "ru" : {
@@ -932,6 +1322,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фильм без названия"
+          }
+        }
+      }
+    },
+    "Untitled Series" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сериал без названия"
           }
         }
       }
@@ -985,9 +1385,6 @@
           }
         }
       }
-    },
-    "YYYY" : {
-
     }
   },
   "version" : "1.0"
