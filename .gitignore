@@ -12,6 +12,3 @@ xcuserdata/
 !/README.md
 /.agents/
 /.codex/
-
-# Unused Xcode template kept only in the local workspace
-/My Movies/

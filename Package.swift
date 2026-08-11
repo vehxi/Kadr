@@ -3,20 +3,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "MyMovies",
+    name: "Kadr",
     defaultLocalization: "en",
     platforms: [
         .macOS(.v26)
     ],
     products: [
-        .executable(name: "MyMovies", targets: ["MyMovies"])
+        .executable(name: "Kadr", targets: ["Kadr"])
     ],
     targets: [
         .executableTarget(
-            name: "MyMovies",
-            path: "MyMovies",
+            name: "Kadr",
+            path: "Kadr",
             exclude: [
-                "MyMovies.entitlements",
+                "Kadr.entitlements",
                 "Resources/Assets.xcassets"
             ],
             resources: [

@@ -49,7 +49,7 @@ struct GeneralSettingsView: View {
 
                         storageRow(
                             title: "Covers",
-                            value: "Application Support/My Movies/Covers",
+                            value: "Application Support/Kadr/Covers",
                             systemImage: "photo.on.rectangle"
                         )
 

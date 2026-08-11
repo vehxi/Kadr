@@ -288,12 +288,12 @@
         }
       }
     },
-    "Application Support/My Movies/Covers" : {
+    "Application Support/Kadr/Covers" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Application Support/My Movies/Covers"
+            "value" : "Application Support/Kadr/Covers"
           }
         }
       }
@@ -815,17 +815,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Моя медиатека"
-          }
-        }
-      }
-    },
-    "My Movies" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Мои фильмы"
           }
         }
       }

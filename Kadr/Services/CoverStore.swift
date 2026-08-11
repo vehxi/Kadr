@@ -13,9 +13,28 @@ actor CoverStore {
             for: .applicationSupportDirectory,
             in: .userDomainMask
         )[0]
-        self.directoryURL = applicationSupport
+        let kadrDirectory = applicationSupport
+            .appendingPathComponent("Kadr", isDirectory: true)
+            .appendingPathComponent("Covers", isDirectory: true)
+        let legacyDirectory = applicationSupport
             .appendingPathComponent("My Movies", isDirectory: true)
             .appendingPathComponent("Covers", isDirectory: true)
+
+        if !fileManager.fileExists(atPath: kadrDirectory.path),
+           fileManager.fileExists(atPath: legacyDirectory.path) {
+            do {
+                try fileManager.createDirectory(
+                    at: kadrDirectory.deletingLastPathComponent(),
+                    withIntermediateDirectories: true
+                )
+                try fileManager.moveItem(at: legacyDirectory, to: kadrDirectory)
+                self.directoryURL = kadrDirectory
+            } catch {
+                self.directoryURL = legacyDirectory
+            }
+        } else {
+            self.directoryURL = kadrDirectory
+        }
     }
 
     func write(_ jpegData: Data) throws -> String {

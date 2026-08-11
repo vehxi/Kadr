@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "100000000000000000000010"
-               BuildableName = "My Movies.app"
-               BlueprintName = "My Movies"
-               ReferencedContainer = "container:MyMovies.xcodeproj">
+               BuildableName = "Kadr.app"
+               BlueprintName = "Kadr"
+               ReferencedContainer = "container:Kadr.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,16 +30,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "100000000000000000000011"
-               BuildableName = "MyMoviesTests.xctest"
-               BlueprintName = "MyMoviesTests"
-               ReferencedContainer = "container:MyMovies.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -57,9 +47,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "100000000000000000000010"
-            BuildableName = "My Movies.app"
-            BlueprintName = "My Movies"
-            ReferencedContainer = "container:MyMovies.xcodeproj">
+            BuildableName = "Kadr.app"
+            BlueprintName = "Kadr"
+            ReferencedContainer = "container:Kadr.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -74,9 +64,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "100000000000000000000010"
-            BuildableName = "My Movies.app"
-            BlueprintName = "My Movies"
-            ReferencedContainer = "container:MyMovies.xcodeproj">
+            BuildableName = "Kadr.app"
+            BlueprintName = "Kadr"
+            ReferencedContainer = "container:Kadr.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

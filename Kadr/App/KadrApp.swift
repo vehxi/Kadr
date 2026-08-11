@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct MyMoviesApp: App {
+struct KadrApp: App {
     private let modelContainer: ModelContainer
     @AppStorage("appLanguage") private var appLanguageRawValue = AppLanguage.system.rawValue
 
