@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GeneralSettingsView: View {
+    @ObservedObject var updateController: UpdateController
     @AppStorage("appLanguage") private var appLanguageRawValue = AppLanguage.system.rawValue
 
     var body: some View {
@@ -33,6 +34,8 @@ struct GeneralSettingsView: View {
                         .frame(width: 150)
                     }
                 }
+
+                UpdateSettingsSection(updateController: updateController)
 
                 SettingsSectionTitle("Storage", systemImage: "internaldrive")
 

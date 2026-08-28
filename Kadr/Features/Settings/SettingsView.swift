@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @ObservedObject var updateController: UpdateController
+
     var body: some View {
         TabView {
-            GeneralSettingsView()
+            GeneralSettingsView(updateController: updateController)
                 .tabItem {
                     Label("General", systemImage: "gearshape")
                 }

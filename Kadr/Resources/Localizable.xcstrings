@@ -290,6 +290,16 @@
         }
       }
     },
+    "Automatically check for updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проверять обновления"
+          }
+        }
+      }
+    },
     "Application Language" : {
       "localizations" : {
         "ru" : {
@@ -388,6 +398,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрыть"
+          }
+        }
+      }
+    },
+    "Check for Updates…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверить обновления…"
+          }
+        }
+      }
+    },
+    "Checking…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка…"
           }
         }
       }
@@ -745,6 +775,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вернуться к редактированию"
+          }
+        }
+      }
+    },
+    "Kadr %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kadr %@"
           }
         }
       }
@@ -1379,6 +1419,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изменено %@"
+          }
+        }
+      }
+    },
+    "Updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновления"
+          }
+        }
+      }
+    },
+    "Updates are delivered from GitHub and verified before installation." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновления загружаются с GitHub и проверяются перед установкой."
           }
         }
       }

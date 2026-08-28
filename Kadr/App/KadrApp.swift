@@ -4,9 +4,12 @@ import SwiftUI
 @main
 struct KadrApp: App {
     private let modelContainer: ModelContainer
+    @StateObject private var updateController: UpdateController
     @AppStorage("appLanguage") private var appLanguageRawValue = AppLanguage.system.rawValue
 
     init() {
+        _updateController = StateObject(wrappedValue: UpdateController())
+
         do {
             modelContainer = try PersistenceController.makeContainer()
         } catch {
@@ -28,12 +31,12 @@ struct KadrApp: App {
         }
         .modelContainer(modelContainer)
         .commands {
-            AppCommands()
+            AppCommands(updateController: updateController)
         }
         .defaultSize(width: 1_080, height: 720)
 
         Settings {
-            SettingsView()
+            SettingsView(updateController: updateController)
                 .environment(\.locale, appLanguage.locale)
         }
         .modelContainer(modelContainer)

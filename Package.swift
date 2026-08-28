@@ -11,12 +11,19 @@ let package = Package(
     products: [
         .executable(name: "Kadr", targets: ["Kadr"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.2")
+    ],
     targets: [
         .executableTarget(
             name: "Kadr",
+            dependencies: [
+                .product(name: "Sparkle", package: "Sparkle")
+            ],
             path: "Kadr",
             exclude: [
                 "Kadr.entitlements",
+                "Info.plist",
                 "Resources/Assets.xcassets"
             ],
             resources: [
