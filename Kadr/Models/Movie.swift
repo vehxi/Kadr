@@ -55,7 +55,7 @@ final class Movie {
         )
         self.statusRawValue = status.rawValue
         self.favoriteFlag = isFavorite
-        self.rating = RatingRules.validated(rating, for: status)
+        self.rating = RatingRules.validated(rating)
         self.synopsis = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
         self.coverFilename = coverFilename
         self.tierRawValue = tier?.rawValue
@@ -69,9 +69,7 @@ final class Movie {
         get { MediaKind(rawValue: mediaKindRawValue) ?? .movie }
         set {
             mediaKindRawValue = newValue.rawValue
-            if newValue == .series {
-                tier = nil
-            } else {
+            if newValue == .movie {
                 releaseEndYear = nil
             }
         }
@@ -112,7 +110,6 @@ final class Movie {
                 favoriteFlag = true
             }
             statusRawValue = newValue.rawValue
-            rating = RatingRules.validated(rating, for: newValue)
         }
     }
 
@@ -163,7 +160,7 @@ final class Movie {
         )
         statusRawValue = status.rawValue
         favoriteFlag = isFavorite
-        self.rating = RatingRules.validated(rating, for: status)
+        self.rating = RatingRules.validated(rating)
         self.synopsis = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
         self.coverFilename = coverFilename
         self.genres = genres

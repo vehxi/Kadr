@@ -7,7 +7,7 @@ struct MovieEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Genre.name) private var genres: [Genre]
+    @Query private var genres: [Genre]
     @Query private var allMovies: [Movie]
 
     private let movie: Movie?
@@ -27,8 +27,6 @@ struct MovieEditorView: View {
 
     @State private var showsFileImporter = false
     @State private var showsDuplicateWarning = false
-    @State private var pendingStatus: ViewingStatus?
-    @State private var showsRatingRemovalWarning = false
     @State private var errorMessage: String?
     @State private var isSaving = false
 
@@ -77,20 +75,6 @@ struct MovieEditorView: View {
             }
         } message: {
             Text("A title with the same name and year already exists.")
-        }
-        .alert("Remove Rating?", isPresented: $showsRatingRemovalWarning) {
-            Button("Cancel", role: .cancel) {
-                pendingStatus = nil
-            }
-            Button("Change Status", role: .destructive) {
-                if let pendingStatus {
-                    status = pendingStatus
-                    rating = nil
-                }
-                pendingStatus = nil
-            }
-        } message: {
-            Text("Ratings are only available for watched titles. Changing the status will clear this rating.")
         }
         .alert("Could Not Save Title", isPresented: errorBinding) {
             Button("OK", role: .cancel) {}
@@ -296,19 +280,13 @@ struct MovieEditorView: View {
                 .accessibilityLabel("Status")
 
                 Spacer(minLength: 10)
-                StarRating(rating: $rating, isEnabled: status.allowsRating)
+                StarRating(rating: $rating)
             }
             .padding(.leading, 14)
             .padding(.trailing, 8)
             .frame(minHeight: 48)
             .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-            if !status.allowsRating {
-                Text("Rating becomes available after the title is watched.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.leading, 2)
-            }
         }
     }
 
@@ -320,7 +298,7 @@ struct MovieEditorView: View {
                     .foregroundStyle(.secondary)
             } else {
                 FlowLayout(spacing: 7) {
-                    ForEach(genres) { genre in
+                    ForEach(sortedGenres) { genre in
                         let isSelected = selectedGenreIDs.contains(genre.id)
                         Button {
                             if isSelected {
@@ -334,7 +312,7 @@ struct MovieEditorView: View {
                                     Image(systemName: "checkmark")
                                         .font(.caption2.weight(.bold))
                                 }
-                                Text(genre.name)
+                                Text(genre.localizedName(locale: locale))
                             }
                             .font(.caption.weight(.medium))
                             .padding(.horizontal, 10)
@@ -349,6 +327,14 @@ struct MovieEditorView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var sortedGenres: [Genre] {
+        genres.sorted {
+            $0.localizedName(locale: locale).localizedStandardCompare(
+                $1.localizedName(locale: locale)
+            ) == .orderedAscending
         }
     }
 
@@ -508,12 +494,7 @@ struct MovieEditorView: View {
         Binding(
             get: { status },
             set: { newStatus in
-                if rating != nil, !newStatus.allowsRating {
-                    pendingStatus = newStatus
-                    showsRatingRemovalWarning = true
-                } else {
-                    status = newStatus
-                }
+                status = newStatus
             }
         )
     }

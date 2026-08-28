@@ -11,7 +11,11 @@ struct TierMovieCardView: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 7) {
-                PosterArtwork(title: movie.title, filename: movie.coverFilename)
+                PosterArtwork(
+                    title: movie.title,
+                    filename: movie.coverFilename,
+                    mediaKind: movie.mediaKind
+                )
                     .frame(width: 96, height: 144)
                     .shadow(
                         color: .black.opacity(isHovering ? 0.22 : 0.12),
@@ -35,7 +39,11 @@ struct TierMovieCardView: View {
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
         .draggable(movie.id.uuidString) {
-            PosterArtwork(title: movie.title, filename: movie.coverFilename)
+            PosterArtwork(
+                title: movie.title,
+                filename: movie.coverFilename,
+                mediaKind: movie.mediaKind
+            )
                 .frame(width: 80, height: 120)
                 .shadow(color: .black.opacity(0.24), radius: 10, y: 6)
         }
@@ -57,6 +65,6 @@ struct TierMovieCardView: View {
             }
         }
         .accessibilityLabel(Text(movie.title))
-        .accessibilityHint(Text("Drag to move this movie to another tier."))
+        .accessibilityHint(Text("Drag to move this title to another tier."))
     }
 }

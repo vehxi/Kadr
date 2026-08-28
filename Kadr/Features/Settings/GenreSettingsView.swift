@@ -2,8 +2,9 @@ import SwiftData
 import SwiftUI
 
 struct GenreSettingsView: View {
+    @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Genre.name) private var genres: [Genre]
+    @Query private var genres: [Genre]
 
     @State private var newGenreName = ""
     @State private var genreToDelete: Genre?
@@ -38,9 +39,10 @@ struct GenreSettingsView: View {
                     .frame(maxWidth: .infinity, minHeight: 260)
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(genres) { genre in
+                        ForEach(sortedGenres) { genre in
                             GenreManagementRow(
                                 genre: genre,
+                                displayName: genre.localizedName(locale: locale),
                                 onRename: { rename(genre, to: $0) },
                                 onDelete: { genreToDelete = genre }
                             )
@@ -136,7 +138,15 @@ struct GenreSettingsView: View {
     }
 
     private var genrePairs: [(id: UUID, name: String)] {
-        genres.map { ($0.id, $0.name) }
+        genres.map { ($0.id, $0.localizedName(locale: locale)) }
+    }
+
+    private var sortedGenres: [Genre] {
+        genres.sorted {
+            $0.localizedName(locale: locale).localizedStandardCompare(
+                $1.localizedName(locale: locale)
+            ) == .orderedAscending
+        }
     }
 
     private func deleteMessage(for genre: Genre) -> String {

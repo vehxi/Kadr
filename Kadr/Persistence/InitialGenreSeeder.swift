@@ -3,20 +3,18 @@ import SwiftData
 
 @MainActor
 enum InitialGenreSeeder {
-    private static let englishGenres = [
-        "Action", "Drama", "Comedy", "Thriller", "Science Fiction",
-        "Fantasy", "Horror", "Documentary", "Animation"
-    ]
+    private static let catalogVersion = 1
+    private static let catalogVersionKey = "genreCatalogVersion"
 
-    private static let russianGenres = [
-        "Боевик", "Драма", "Комедия", "Триллер", "Фантастика",
-        "Фэнтези", "Ужасы", "Документальный", "Анимация"
-    ]
-
-    static func seedIfNeeded(context: ModelContext, language: AppLanguage) throws {
-        var descriptor = FetchDescriptor<Genre>()
-        descriptor.fetchLimit = 1
-        guard try context.fetch(descriptor).isEmpty else { return }
+    static func seedIfNeeded(
+        context: ModelContext,
+        language: AppLanguage,
+        defaults: UserDefaults = .standard
+    ) throws {
+        let genres = try context.fetch(FetchDescriptor<Genre>())
+        guard genres.isEmpty || defaults.integer(forKey: catalogVersionKey) < catalogVersion else {
+            return
+        }
 
         let usesRussian: Bool
         switch language {
@@ -28,9 +26,21 @@ enum InitialGenreSeeder {
             usesRussian = Locale.preferredLanguages.first?.hasPrefix("ru") == true
         }
 
-        for name in usesRussian ? russianGenres : englishGenres {
-            context.insert(Genre(name: name))
+        for genre in genres where genre.catalogID == nil {
+            genre.catalogID = GenreCatalog.definition(matching: genre.name)?.id
+        }
+
+        let existingCatalogIDs = Set(genres.compactMap(\.catalogID))
+        let locale = Locale(identifier: usesRussian ? "ru" : "en")
+        for definition in GenreCatalog.definitions where !existingCatalogIDs.contains(definition.id) {
+            context.insert(
+                Genre(
+                    name: definition.name(for: locale),
+                    catalogID: definition.id
+                )
+            )
         }
         try context.save()
+        defaults.set(catalogVersion, forKey: catalogVersionKey)
     }
 }

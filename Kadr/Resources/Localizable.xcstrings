@@ -14,12 +14,12 @@
         }
       }
     },
-    "%@ tier, %lld movies" : {
+    "%@ tier, %lld titles" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ tier, %2$lld movies"
+            "state" : "translated",
+            "value" : "Тир %1$@, позиций: %2$lld"
           }
         }
       }
@@ -38,6 +38,7 @@
       }
     },
     "%lld movies" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -73,6 +74,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Звёзд: %lld"
+          }
+        }
+      }
+    },
+    "%lld titles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Позиций: %lld"
           }
         }
       }
@@ -173,6 +184,7 @@
       }
     },
     "Add movies to your library before building a tier list." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -191,6 +203,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить"
+          }
+        }
+      }
+    },
+    "Add titles to your library before building a tier list." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте фильмы или сериалы в библиотеку, прежде чем составлять тир-лист."
           }
         }
       }
@@ -319,6 +341,7 @@
       }
     },
     "Change Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -543,11 +566,22 @@
       }
     },
     "Drag to move this movie to another tier." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перетащите, чтобы переместить фильм в другую категорию."
+          }
+        }
+      }
+    },
+    "Drag to move this title to another tier." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетащите, чтобы переместить эту позицию в другую категорию."
           }
         }
       }
@@ -563,11 +597,22 @@
       }
     },
     "Drop movies here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перетащите фильмы сюда"
+          }
+        }
+      }
+    },
+    "Drop titles here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетащите фильмы или сериалы сюда"
           }
         }
       }
@@ -953,6 +998,7 @@
       }
     },
     "Rating becomes available after the title is watched." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -974,6 +1020,7 @@
       }
     },
     "Ratings are only available for watched titles. Changing the status will clear this rating." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1025,6 +1072,7 @@
       }
     },
     "Remove Rating?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

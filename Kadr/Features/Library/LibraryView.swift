@@ -129,7 +129,7 @@ struct LibraryView: View {
     @ViewBuilder
     private var content: some View {
         if selection == .tierList {
-            TierListView(movies: movies.filter { $0.mediaKind == .movie }) { movie in
+            TierListView(movies: movies) { movie in
                 presentedSheet = MovieSheet(content: .detail(movie))
             }
         } else if filteredMovies.isEmpty {
@@ -161,8 +161,10 @@ struct LibraryView: View {
         switch selection ?? .all {
         case .all:
             return movies
-        case .movies, .tierList:
+        case .movies:
             return movies.filter { $0.mediaKind == .movie }
+        case .tierList:
+            return movies
         case .series:
             return movies.filter { $0.mediaKind == .series }
         case .favorites:

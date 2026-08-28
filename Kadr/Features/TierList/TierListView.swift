@@ -15,7 +15,7 @@ struct TierListView: View {
                 ContentUnavailableView {
                     Label("Your Library Is Empty", systemImage: "square.grid.3x3.square")
                 } description: {
-                    Text("Add movies to your library before building a tier list.")
+                    Text("Add titles to your library before building a tier list.")
                 }
             } else {
                 ScrollView {
@@ -50,7 +50,7 @@ struct TierListView: View {
 
             Spacer()
 
-            Text("\(movies.count) movies")
+            Text("\(movies.count) titles")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
@@ -164,7 +164,7 @@ private struct TierLane: View {
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 14) {
                     if movies.isEmpty {
-                        Label("Drop movies here", systemImage: "arrow.down.to.line")
+                        Label("Drop titles here", systemImage: "arrow.down.to.line")
                             .font(.subheadline)
                             .foregroundStyle(.tertiary)
                             .frame(minWidth: 160, minHeight: 176)
@@ -193,6 +193,6 @@ private struct TierLane: View {
             isDropTarget = $0
         }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(Text("\(title) tier, \(movies.count) movies"))
+        .accessibilityLabel(Text("\(title) tier, \(movies.count) titles"))
     }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GenreManagementRow: View {
     let genre: Genre
+    let displayName: String
     let onRename: (String) -> Void
     let onDelete: () -> Void
 
@@ -11,13 +12,15 @@ struct GenreManagementRow: View {
 
     init(
         genre: Genre,
+        displayName: String,
         onRename: @escaping (String) -> Void,
         onDelete: @escaping () -> Void
     ) {
         self.genre = genre
+        self.displayName = displayName
         self.onRename = onRename
         self.onDelete = onDelete
-        _name = State(initialValue: genre.name)
+        _name = State(initialValue: displayName)
     }
 
     var body: some View {
@@ -47,7 +50,7 @@ struct GenreManagementRow: View {
             .buttonStyle(.borderless)
             .disabled(
                 TextNormalizer.displayName(name).isEmpty
-                    || TextNormalizer.displayName(name) == genre.name
+                    || TextNormalizer.displayName(name) == displayName
             )
             .accessibilityLabel("Save Genre Name")
 
@@ -74,5 +77,8 @@ struct GenreManagementRow: View {
             value: isHovering
         )
         .onHover { isHovering = $0 }
+        .onChange(of: displayName) { _, newValue in
+            name = newValue
+        }
     }
 }

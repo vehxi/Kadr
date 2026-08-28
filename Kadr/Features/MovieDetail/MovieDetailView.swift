@@ -11,8 +11,6 @@ struct MovieDetailView: View {
 
     @State private var showsEditor = false
     @State private var showsDeleteConfirmation = false
-    @State private var pendingStatus: ViewingStatus?
-    @State private var showsRatingRemovalWarning = false
     @State private var errorMessage: String?
     @State private var heartIsPressed = false
 
@@ -51,16 +49,6 @@ struct MovieDetailView: View {
             }
         } message: {
             Text("This title, its viewing progress, and its local cover copy will be permanently deleted.")
-        }
-        .alert("Remove Rating?", isPresented: $showsRatingRemovalWarning) {
-            Button("Cancel", role: .cancel) {
-                pendingStatus = nil
-            }
-            Button("Change Status", role: .destructive) {
-                applyPendingStatus()
-            }
-        } message: {
-            Text("Ratings are only available for watched titles. Changing the status will clear this rating.")
         }
         .alert("Could Not Complete the Action", isPresented: errorBinding) {
             Button("OK", role: .cancel) {}
@@ -103,8 +91,8 @@ struct MovieDetailView: View {
                 VStack(alignment: .leading, spacing: 9) {
                     sectionTitle("Genres")
                     FlowLayout(spacing: 7) {
-                        ForEach(movie.genres.sorted { $0.name < $1.name }) { genre in
-                            Text(genre.name)
+                        ForEach(sortedGenres) { genre in
+                            Text(genre.localizedName(locale: locale))
                                 .font(.caption.weight(.medium))
                                 .padding(.horizontal, 9)
                                 .padding(.vertical, 5)
@@ -143,6 +131,14 @@ struct MovieDetailView: View {
             .monospacedDigit()
         }
         .frame(maxWidth: .infinity, minHeight: 375, alignment: .topLeading)
+    }
+
+    private var sortedGenres: [Genre] {
+        movie.genres.sorted {
+            $0.localizedName(locale: locale).localizedStandardCompare(
+                $1.localizedName(locale: locale)
+            ) == .orderedAscending
+        }
     }
 
     private var headerActions: some View {
@@ -222,10 +218,7 @@ struct MovieDetailView: View {
 
             Spacer(minLength: 10)
 
-            StarRating(
-                rating: ratingBinding,
-                isEnabled: movie.status.allowsRating
-            )
+            StarRating(rating: ratingBinding)
         }
         .padding(.leading, 14)
         .padding(.trailing, 8)
@@ -321,13 +314,8 @@ struct MovieDetailView: View {
         Binding(
             get: { movie.status },
             set: { newStatus in
-                if movie.rating != nil, !newStatus.allowsRating {
-                    pendingStatus = newStatus
-                    showsRatingRemovalWarning = true
-                } else {
-                    movie.status = newStatus
-                    saveChanges()
-                }
+                movie.status = newStatus
+                saveChanges()
             }
         )
     }
@@ -336,7 +324,7 @@ struct MovieDetailView: View {
         Binding(
             get: { movie.rating },
             set: { newValue in
-                movie.rating = RatingRules.validated(newValue, for: movie.status)
+                movie.rating = RatingRules.validated(newValue)
                 movie.updatedAt = .now
                 saveChanges()
             }
@@ -398,14 +386,6 @@ struct MovieDetailView: View {
                 heartIsPressed = false
             }
         }
-    }
-
-    private func applyPendingStatus() {
-        guard let pendingStatus else { return }
-        movie.status = pendingStatus
-        movie.rating = nil
-        self.pendingStatus = nil
-        saveChanges()
     }
 
     private func saveChanges() {

@@ -13,8 +13,6 @@ enum ViewingStatus: String, Codable, CaseIterable, Identifiable, Sendable {
         self == .watched
     }
 
-    var allowsRating: Bool { isWatched }
-
     var titleKey: LocalizedStringKey {
         switch self {
         case .wantToWatch: "Want to Watch"
