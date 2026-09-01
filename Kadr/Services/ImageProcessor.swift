@@ -22,7 +22,13 @@ enum ImageProcessingError: LocalizedError {
 enum ImageProcessor {
     static let maximumPixelDimension = 1_600
 
-    static func normalizedJPEGData(from data: Data) throws -> Data {
+    @concurrent
+    static func normalizedJPEGData(contentsOf url: URL) async throws -> Data {
+        try await normalizedJPEGData(from: Data(contentsOf: url))
+    }
+
+    @concurrent
+    static func normalizedJPEGData(from data: Data) async throws -> Data {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
             throw ImageProcessingError.unsupported
         }
@@ -31,7 +37,7 @@ enum ImageProcessor {
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceThumbnailMaxPixelSize: maximumPixelDimension,
-            kCGImageSourceShouldCacheImmediately: true
+            kCGImageSourceShouldCacheImmediately: true,
         ]
         guard let image = CGImageSourceCreateThumbnailAtIndex(
             source,
@@ -52,7 +58,7 @@ enum ImageProcessor {
         }
 
         let properties: [CFString: Any] = [
-            kCGImageDestinationLossyCompressionQuality: 0.85
+            kCGImageDestinationLossyCompressionQuality: 0.85,
         ]
         CGImageDestinationAddImage(destination, image, properties as CFDictionary)
         guard CGImageDestinationFinalize(destination) else {

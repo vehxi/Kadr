@@ -690,11 +690,8 @@ struct MovieEditorView: View {
         }
 
         do {
-            let data = try Data(contentsOf: url)
-            pendingCoverData = try await Task.detached {
-                try ImageProcessor.normalizedJPEGData(from: data)
-            }.value
-            removesExistingCover = false
+            let data = try await ImageProcessor.normalizedJPEGData(contentsOf: url)
+            applyPendingCover(data)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -710,13 +707,16 @@ struct MovieEditorView: View {
 
         Task { @MainActor in
             do {
-                pendingCoverData = try await Task.detached {
-                    try ImageProcessor.normalizedJPEGData(from: data)
-                }.value
-                removesExistingCover = false
+                let data = try await ImageProcessor.normalizedJPEGData(from: data)
+                applyPendingCover(data)
             } catch {
                 errorMessage = error.localizedDescription
             }
         }
+    }
+
+    private func applyPendingCover(_ data: Data) {
+        pendingCoverData = data
+        removesExistingCover = false
     }
 }

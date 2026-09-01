@@ -7,6 +7,7 @@ PROJECT_PATH="$ROOT_DIR/Kadr.xcodeproj"
 SCHEME="Kadr"
 REPOSITORY="${REPOSITORY:-vehxi/Kadr}"
 KEYCHAIN_ACCOUNT="${SPARKLE_KEYCHAIN_ACCOUNT:-com.vehxi.Kadr}"
+NOTES_SOURCE="${RELEASE_NOTES_FILE:-}"
 BRANCH="$(git -C "$ROOT_DIR" branch --show-current)"
 
 if [[ "$BRANCH" != "main" ]]; then
@@ -73,19 +74,27 @@ PREVIOUS_TAG="$(
         2>/dev/null || true
 )"
 
-{
-    echo "## Что изменилось"
-    git -C "$ROOT_DIR" log \
-        --no-merges \
-        --reverse \
-        --pretty="- %s" \
-        "${PREVIOUS_TAG:+$PREVIOUS_TAG..}HEAD"
-
-    if [[ -n "$PREVIOUS_TAG" ]]; then
-        echo
-        echo "**Полный список изменений**: https://github.com/$REPOSITORY/compare/$PREVIOUS_TAG...$TAG"
+if [[ -n "$NOTES_SOURCE" ]]; then
+    if [[ ! -f "$NOTES_SOURCE" ]]; then
+        echo "RELEASE_NOTES_FILE does not exist: $NOTES_SOURCE" >&2
+        exit 1
     fi
-} > "$RELEASE_NOTES"
+    cp "$NOTES_SOURCE" "$RELEASE_NOTES"
+else
+    {
+        echo "## Что изменилось"
+        git -C "$ROOT_DIR" log \
+            --no-merges \
+            --reverse \
+            --pretty="- %s" \
+            "${PREVIOUS_TAG:+$PREVIOUS_TAG..}HEAD"
+
+        if [[ -n "$PREVIOUS_TAG" ]]; then
+            echo
+            echo "**Полный список изменений**: https://github.com/$REPOSITORY/compare/$PREVIOUS_TAG...$TAG"
+        fi
+    } > "$RELEASE_NOTES"
+fi
 
 curl \
     --fail \
@@ -125,7 +134,7 @@ gh release create "$TAG" \
     --repo "$REPOSITORY" \
     --target "$LOCAL_COMMIT" \
     --notes-file "$RELEASE_NOTES" \
-    --title "Kadr $TAG" \
+    --title "Kadr $VERSION" \
     --latest
 
 echo "Published Kadr $TAG: https://github.com/$REPOSITORY/releases/tag/$TAG"

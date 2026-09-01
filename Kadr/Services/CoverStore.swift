@@ -55,6 +55,13 @@ actor CoverStore {
         try fileManager.removeItem(at: url)
     }
 
+    func data(for filename: String?) throws -> Data? {
+        guard let filename else { return nil }
+        let url = directoryURL.appendingPathComponent(filename)
+        guard fileManager.fileExists(atPath: url.path) else { return nil }
+        return try Data(contentsOf: url)
+    }
+
     func url(for filename: String?) -> URL? {
         guard let filename else { return nil }
         return directoryURL.appendingPathComponent(filename)

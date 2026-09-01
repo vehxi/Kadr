@@ -1252,6 +1252,16 @@
         }
       }
     },
+    "The backup is damaged and cannot be restored safely." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Резервная копия повреждена, и её нельзя безопасно восстановить."
+          }
+        }
+      }
+    },
     "The clipboard does not contain an image." : {
       "localizations" : {
         "ru" : {
@@ -1303,6 +1313,16 @@
         }
       }
     },
+    "The selected file is not a valid Kadr backup." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранный файл не является корректной резервной копией Kadr."
+          }
+        }
+      }
+    },
     "This genre will be permanently deleted." : {
       "localizations" : {
         "ru" : {
@@ -1319,6 +1339,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Этот жанр будет удалён из %lld фильмов. Сами фильмы удалены не будут."
+          }
+        }
+      }
+    },
+    "This backup was created by an unsupported version of Kadr." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта резервная копия создана неподдерживаемой версией Kadr."
           }
         }
       }

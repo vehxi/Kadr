@@ -34,5 +34,25 @@
     <string>KC7teFShO8ey6ehs8RRN8ON9BgJ7X1OtK6UxfdPL96c=</string>
     <key>SUScheduledCheckInterval</key>
     <integer>86400</integer>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Kadr Library Backup</string>
+            <key>UTTypeIdentifier</key>
+            <string>app.kadr.backup</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>kadrbackup</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
 </dict>
 </plist>
