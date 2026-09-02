@@ -96,7 +96,7 @@ struct MovieDetailView: View {
                                 .font(.caption.weight(.medium))
                                 .padding(.horizontal, 9)
                                 .padding(.vertical, 5)
-                                .background(.quaternary.opacity(0.55), in: Capsule())
+                                .background(.quaternary, in: Capsule())
                         }
                     }
                 }
@@ -127,7 +127,7 @@ struct MovieDetailView: View {
                 Text("Updated \(movie.updatedAt, format: .dateTime.day().month().year())")
             }
             .font(.caption)
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(.primary.opacity(0.65))
             .monospacedDigit()
         }
         .frame(maxWidth: .infinity, minHeight: 375, alignment: .topLeading)
@@ -207,7 +207,7 @@ struct MovieDetailView: View {
                         .lineLimit(1)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
                 .font(.subheadline.weight(.medium))
                 .contentShape(Rectangle())
@@ -223,7 +223,7 @@ struct MovieDetailView: View {
         .padding(.leading, 14)
         .padding(.trailing, 8)
         .frame(minHeight: 48)
-        .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private func sectionTitle(_ key: LocalizedStringKey) -> some View {

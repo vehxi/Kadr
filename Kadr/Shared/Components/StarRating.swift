@@ -26,6 +26,10 @@ struct StarRating: View {
                         Image(systemName: "star.fill")
                             .foregroundStyle(.yellow)
                             .opacity(isFilled ? 1 : 0)
+
+                        Image(systemName: "star")
+                            .foregroundStyle(.primary.opacity(0.70))
+                            .opacity(isFilled ? 1 : 0)
                     }
                         .scaleEffect(isHovered ? 1.12 : 1)
                         .animation(
@@ -53,7 +57,7 @@ struct StarRating: View {
                     rating = nil
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
                 .frame(width: 40, height: 40)

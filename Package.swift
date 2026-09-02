@@ -29,6 +29,11 @@ let package = Package(
             resources: [
                 .process("Resources/Localizable.xcstrings")
             ]
+        ),
+        .testTarget(
+            name: "KadrTests",
+            dependencies: ["Kadr"],
+            path: "Tests/KadrTests"
         )
     ]
 )

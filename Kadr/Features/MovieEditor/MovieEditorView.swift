@@ -27,8 +27,13 @@ struct MovieEditorView: View {
 
     @State private var showsFileImporter = false
     @State private var showsDuplicateWarning = false
+    @State private var showsGenrePicker = false
+    @State private var genreSearchText = ""
     @State private var errorMessage: String?
     @State private var isSaving = false
+
+    @FocusState private var genreSearchIsFocused: Bool
+    @FocusState private var genrePickerButtonIsFocused: Bool
 
     init(movie: Movie? = nil) {
         self.movie = movie
@@ -136,7 +141,7 @@ struct MovieEditorView: View {
             }
             .foregroundStyle(.secondary)
             .padding(.horizontal, 5)
-            .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             Text("Choose, drop, or paste an image.")
                 .font(.caption)
@@ -199,7 +204,7 @@ struct MovieEditorView: View {
                     .font(.title3.weight(.medium))
                     .padding(.horizontal, 12)
                     .frame(minHeight: 44)
-                    .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .accessibilityLabel("Title")
             }
             .padding(.top, 12)
@@ -245,7 +250,7 @@ struct MovieEditorView: View {
                     .textFieldStyle(.plain)
                     .lineLimit(5...10)
                     .padding(12)
-                    .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .accessibilityLabel("Description")
             }
             .padding(.top, 22)
@@ -270,7 +275,7 @@ struct MovieEditorView: View {
                         Text(status.titleKey)
                         Image(systemName: "chevron.up.chevron.down")
                             .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
                     .font(.subheadline.weight(.medium))
                     .contentShape(Rectangle())
@@ -285,7 +290,7 @@ struct MovieEditorView: View {
             .padding(.leading, 14)
             .padding(.trailing, 8)
             .frame(minHeight: 48)
-            .background(.quaternary.opacity(0.38), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
         }
     }
@@ -297,36 +302,98 @@ struct MovieEditorView: View {
                 Text("Add genres in Settings.")
                     .foregroundStyle(.secondary)
             } else {
-                FlowLayout(spacing: 7) {
-                    ForEach(sortedGenres) { genre in
-                        let isSelected = selectedGenreIDs.contains(genre.id)
-                        Button {
-                            if isSelected {
-                                selectedGenreIDs.remove(genre.id)
-                            } else {
-                                selectedGenreIDs.insert(genre.id)
-                            }
-                        } label: {
-                            HStack(spacing: 5) {
-                                if isSelected {
-                                    Image(systemName: "checkmark")
-                                        .font(.caption2.weight(.bold))
-                                }
-                                Text(genre.localizedName(locale: locale))
-                            }
-                            .font(.caption.weight(.medium))
-                            .padding(.horizontal, 10)
-                            .frame(minHeight: 40)
-                            .background(
-                                isSelected ? Color.accentColor.opacity(0.16) : Color.primary.opacity(0.06),
-                                in: Capsule()
-                            )
+                if selectedGenres.isEmpty {
+                    Text("No genres selected.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    FlowLayout(spacing: 7) {
+                        ForEach(selectedGenres) { genre in
+                            Label(genre.localizedName(locale: locale), systemImage: "checkmark")
+                                .font(.caption.weight(.medium))
+                                .padding(.horizontal, 9)
+                                .padding(.vertical, 5)
+                                .background(.quaternary, in: Capsule())
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    }
+                }
+
+                HStack(spacing: 10) {
+                    Button {
+                        showsGenrePicker = true
+                    } label: {
+                        Label {
+                            Text(selectedGenres.isEmpty ? "Add Genres…" : "Edit Genres…")
+                        } icon: {
+                            Image(systemName: selectedGenres.isEmpty ? "plus" : "slider.horizontal.3")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .focused($genrePickerButtonIsFocused)
+                    .popover(isPresented: $showsGenrePicker, arrowEdge: .bottom) {
+                        genrePicker
+                    }
+                    .accessibilityHint("Opens a searchable list of genres.")
+
+                    if !selectedGenres.isEmpty {
+                        Text("\(selectedGenreIDs.count) selected")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
                     }
                 }
             }
+        }
+    }
+
+    private var genrePicker: some View {
+        VStack(spacing: 0) {
+            TextField("Search Genres", text: $genreSearchText)
+                .textFieldStyle(.roundedBorder)
+                .focused($genreSearchIsFocused)
+                .padding(12)
+
+            Divider()
+
+            if filteredGenres.isEmpty {
+                ContentUnavailableView(
+                    "No Genres Found",
+                    systemImage: "magnifyingglass",
+                    description: Text("Try another search.")
+                )
+            } else {
+                List(filteredGenres) { genre in
+                    Toggle(
+                        genre.localizedName(locale: locale),
+                        isOn: genreSelectionBinding(for: genre.id)
+                    )
+                    .toggleStyle(.checkbox)
+                    .frame(minHeight: 28)
+                }
+                .listStyle(.inset)
+            }
+
+            Divider()
+
+            HStack {
+                Text("\(selectedGenreIDs.count) selected")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                Spacer()
+                Button("Done") {
+                    showsGenrePicker = false
+                }
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding(12)
+        }
+        .frame(width: 320, height: 400)
+        .onAppear {
+            genreSearchIsFocused = true
+        }
+        .onDisappear {
+            genreSearchText = ""
+            genrePickerButtonIsFocused = true
         }
     }
 
@@ -336,6 +403,31 @@ struct MovieEditorView: View {
                 $1.localizedName(locale: locale)
             ) == .orderedAscending
         }
+    }
+
+    private var selectedGenres: [Genre] {
+        sortedGenres.filter { selectedGenreIDs.contains($0.id) }
+    }
+
+    private var filteredGenres: [Genre] {
+        let query = TextNormalizer.normalize(genreSearchText)
+        guard !query.isEmpty else { return sortedGenres }
+        return sortedGenres.filter {
+            TextNormalizer.normalize($0.localizedName(locale: locale)).localizedStandardContains(query)
+        }
+    }
+
+    private func genreSelectionBinding(for genreID: UUID) -> Binding<Bool> {
+        Binding(
+            get: { selectedGenreIDs.contains(genreID) },
+            set: { isSelected in
+                if isSelected {
+                    selectedGenreIDs.insert(genreID)
+                } else {
+                    selectedGenreIDs.remove(genreID)
+                }
+            }
+        )
     }
 
     private var seriesEditor: some View {
@@ -370,7 +462,7 @@ struct MovieEditorView: View {
                     .frame(minHeight: 44)
                 }
             }
-            .background(.quaternary.opacity(0.30), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
     }
 

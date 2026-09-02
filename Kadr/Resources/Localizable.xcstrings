@@ -68,6 +68,16 @@
         }
       }
     },
+    "%lld selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрано: %lld"
+          }
+        }
+      }
+    },
     "%lld stars" : {
       "localizations" : {
         "ru" : {
@@ -168,6 +178,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавьте жанры в настройках."
+          }
+        }
+      }
+    },
+    "Add Genres…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить жанры…"
           }
         }
       }
@@ -679,6 +699,16 @@
         }
       }
     },
+    "Edit Genres…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить жанры…"
+          }
+        }
+      }
+    },
     "English" : {
       "localizations" : {
         "ru" : {
@@ -934,6 +964,26 @@
         }
       }
     },
+    "No Genres Found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жанры не найдены"
+          }
+        }
+      }
+    },
+    "No genres selected." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жанры не выбраны."
+          }
+        }
+      }
+    },
     "No Movies Here" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -992,6 +1042,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Opens a searchable list of genres." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает список жанров с поиском."
           }
         }
       }
@@ -1148,6 +1208,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Всё равно сохранить"
+          }
+        }
+      }
+    },
+    "Search Genres" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск жанров"
           }
         }
       }
@@ -1399,6 +1469,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "По"
+          }
+        }
+      }
+    },
+    "Try another search." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте изменить запрос."
           }
         }
       }
