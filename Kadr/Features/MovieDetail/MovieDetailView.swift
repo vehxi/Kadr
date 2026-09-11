@@ -3,38 +3,41 @@ import SwiftUI
 
 struct MovieDetailView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var modelContext
 
     let movie: Movie
+    let onDelete: () -> Void
 
     @State private var showsEditor = false
     @State private var showsDeleteConfirmation = false
     @State private var errorMessage: String?
     @State private var heartIsPressed = false
 
+    init(movie: Movie, onDelete: @escaping () -> Void) {
+        self.movie = movie
+        self.onDelete = onDelete
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
+        ScrollView {
+            ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 32) {
-                    PosterArtwork(
-                        title: movie.title,
-                        filename: movie.coverFilename,
-                        mediaKind: movie.mediaKind
-                    )
-                        .frame(width: 250, height: 375)
-                        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
+                    poster(width: 250, height: 375)
 
                     details
+                        .frame(minWidth: 420)
                 }
-                .padding(32)
-            }
 
-            Divider()
-            actions
+                VStack(spacing: 24) {
+                    poster(width: 180, height: 270)
+                    details
+                }
+            }
+            .padding(32)
+            .frame(maxWidth: 1040, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .top)
         }
-        .frame(minWidth: 820, idealWidth: 900, minHeight: 500, idealHeight: 500)
         .sheet(isPresented: $showsEditor) {
             MovieEditorView(movie: movie)
                 .environment(\.locale, locale)
@@ -55,6 +58,16 @@ struct MovieDetailView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+    }
+
+    private func poster(width: CGFloat, height: CGFloat) -> some View {
+        PosterArtwork(
+            title: movie.title,
+            filename: movie.coverFilename,
+            mediaKind: movie.mediaKind
+        )
+        .frame(width: width, height: height)
+        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
     }
 
     private var details: some View {
@@ -151,7 +164,7 @@ struct MovieDetailView: View {
                     .frame(width: 40, height: 40)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderless)
             .help(localized(movie.isFavorite ? "Remove from Favorites" : "Add to Favorites"))
             .accessibilityLabel(localized(movie.isFavorite ? "Remove from Favorites" : "Add to Favorites"))
             .accessibilityValue(localized(movie.isFavorite ? "Favorite" : "Not Favorite"))
@@ -165,7 +178,7 @@ struct MovieDetailView: View {
                     .frame(width: 40, height: 40)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderless)
             .help("Edit")
             .accessibilityLabel("Edit")
 
@@ -187,6 +200,7 @@ struct MovieDetailView: View {
             .fixedSize()
             .help("More")
             .accessibilityLabel("More")
+
         }
     }
 
@@ -297,19 +311,6 @@ struct MovieDetailView: View {
         .padding(.vertical, 4)
     }
 
-    private var actions: some View {
-        HStack {
-            Spacer()
-            Button("Done") {
-                dismiss()
-            }
-            .keyboardShortcut(.cancelAction)
-            .buttonStyle(.borderedProminent)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-    }
-
     private var statusBinding: Binding<ViewingStatus> {
         Binding(
             get: { movie.status },
@@ -405,7 +406,7 @@ struct MovieDetailView: View {
             modelContext.delete(movie)
             try modelContext.save()
             try await CoverStore.shared.delete(filename: filename)
-            dismiss()
+            onDelete()
         } catch {
             modelContext.rollback()
             errorMessage = error.localizedDescription

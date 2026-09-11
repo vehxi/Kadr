@@ -37,7 +37,7 @@ struct StarRating: View {
                             value: hoveredRating
                         )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .frame(width: 40, height: 40)
                 .contentShape(Rectangle())
                 .disabled(!isEnabled)
@@ -59,7 +59,7 @@ struct StarRating: View {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .frame(width: 40, height: 40)
                 .contentShape(Rectangle())
                 .disabled(!isEnabled)

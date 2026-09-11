@@ -381,6 +381,17 @@
         }
       }
     },
+    "Choose Cover" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать обложку"
+          }
+        }
+      }
+    },
     "Choose, drop, or paste an image." : {
       "localizations" : {
         "ru" : {
@@ -1046,6 +1057,16 @@
         }
       }
     },
+    "Opens an image picker. You can also drop or paste an image." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает выбор изображения. Также можно перетащить или вставить изображение."
+          }
+        }
+      }
+    },
     "Opens a searchable list of genres." : {
       "localizations" : {
         "ru" : {
@@ -1178,6 +1199,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить оценку?"
+          }
+        }
+      }
+    },
+    "Replace Cover" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заменить обложку"
           }
         }
       }
@@ -1479,6 +1511,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Попробуйте изменить запрос."
+          }
+        }
+      }
+    },
+    "Toggle Sidebar" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать или скрыть боковую панель"
           }
         }
       }

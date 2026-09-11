@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct AppCommands: Commands {
@@ -16,6 +17,17 @@ struct AppCommands: Commands {
                 NotificationCenter.default.post(name: .newMovieRequested, object: nil)
             }
             .keyboardShortcut("n", modifiers: .command)
+        }
+
+        CommandGroup(replacing: .sidebar) {
+            Button("Toggle Sidebar") {
+                NSApp.sendAction(
+                    #selector(NSSplitViewController.toggleSidebar(_:)),
+                    to: nil,
+                    from: nil
+                )
+            }
+            .keyboardShortcut("b", modifiers: .command)
         }
     }
 }

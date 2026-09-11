@@ -8,7 +8,8 @@ struct LibraryView: View {
     @Query(sort: \Movie.updatedAt, order: .reverse) private var movies: [Movie]
 
     @State private var selection: LibraryFilter? = .all
-    @State private var presentedSheet: MovieSheet?
+    @State private var navigationPath: [UUID] = []
+    @State private var showsAddEditor = false
     @State private var startupError: String?
 
     private let grid = [
@@ -20,31 +21,35 @@ struct LibraryView: View {
             sidebar
                 .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         } detail: {
-            content
-                .navigationTitle(selectionTitle)
-                .background(WindowTitleUpdater(title: selectionTitle))
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            presentAddMovie()
-                        } label: {
-                            Label("Add Title", systemImage: "plus")
+            NavigationStack(path: $navigationPath) {
+                content
+                    .navigationTitle(selectionTitle)
+                    .background(WindowTitleUpdater(title: selectionTitle))
+                    .toolbar {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button {
+                                presentAddMovie()
+                            } label: {
+                                Label("Add Title", systemImage: "plus")
+                            }
+                            .keyboardShortcut("n", modifiers: .command)
+                            .help("Add Title")
                         }
-                        .keyboardShortcut("n", modifiers: .command)
-                        .help("Add Title")
                     }
-                }
-        }
-        .sheet(item: $presentedSheet) { sheet in
-            Group {
-                switch sheet.content {
-                case .add:
-                    MovieEditorView()
-                case .detail(let movie):
-                    MovieDetailView(movie: movie)
-                }
+                    .navigationDestination(for: UUID.self) { movieID in
+                        if let movie = movie(withID: movieID) {
+                            MovieDetailView(movie: movie) {
+                                navigationPath.removeAll()
+                            }
+                            .navigationTitle(movie.title)
+                        }
+                    }
             }
-            .environment(\.locale, locale)
+        }
+        .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $showsAddEditor) {
+            MovieEditorView()
+                .environment(\.locale, locale)
         }
         .onReceive(NotificationCenter.default.publisher(for: .newMovieRequested)) { _ in
             presentAddMovie()
@@ -62,6 +67,14 @@ struct LibraryView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(startupError ?? "")
+        }
+        .onChange(of: selection) {
+            navigationPath.removeAll()
+        }
+        .onChange(of: movies.map(\.id)) { _, movieIDs in
+            if navigationPath.contains(where: { !movieIDs.contains($0) }) {
+                navigationPath.removeAll()
+            }
         }
     }
 
@@ -130,7 +143,7 @@ struct LibraryView: View {
     private var content: some View {
         if selection == .tierList {
             TierListView(movies: movies) { movie in
-                presentedSheet = MovieSheet(content: .detail(movie))
+                showDetails(for: movie)
             }
         } else if filteredMovies.isEmpty {
             ContentUnavailableView {
@@ -148,7 +161,7 @@ struct LibraryView: View {
                 LazyVGrid(columns: grid, alignment: .leading, spacing: 32) {
                     ForEach(filteredMovies) { movie in
                         MovieCardView(movie: movie) {
-                            presentedSheet = MovieSheet(content: .detail(movie))
+                            showDetails(for: movie)
                         }
                     }
                 }
@@ -172,6 +185,10 @@ struct LibraryView: View {
         case .status(let status):
             return movies.filter { $0.status == status }
         }
+    }
+
+    private func movie(withID id: UUID) -> Movie? {
+        movies.first { $0.id == id }
     }
 
     private var selectionTitle: String {
@@ -239,7 +256,11 @@ struct LibraryView: View {
     }
 
     private func presentAddMovie() {
-        presentedSheet = MovieSheet(content: .add)
+        showsAddEditor = true
+    }
+
+    private func showDetails(for movie: Movie) {
+        navigationPath = [movie.id]
     }
 }
 

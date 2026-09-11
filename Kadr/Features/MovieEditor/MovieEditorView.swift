@@ -4,7 +4,13 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct MovieEditorView: View {
+    private enum EditorField: Hashable {
+        case title
+        case synopsis
+    }
+
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var modelContext
     @Query private var genres: [Genre]
@@ -31,9 +37,12 @@ struct MovieEditorView: View {
     @State private var genreSearchText = ""
     @State private var errorMessage: String?
     @State private var isSaving = false
+    @State private var coverIsHovered = false
 
+    @FocusState private var coverButtonIsFocused: Bool
     @FocusState private var genreSearchIsFocused: Bool
     @FocusState private var genrePickerButtonIsFocused: Bool
+    @FocusState private var focusedField: EditorField?
 
     init(movie: Movie? = nil) {
         self.movie = movie
@@ -90,29 +99,56 @@ struct MovieEditorView: View {
 
     private var coverSection: some View {
         VStack(spacing: 14) {
-            coverPreview
-                .frame(width: 240, height: 360)
-                .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
-                .dropDestination(for: URL.self) { urls, _ in
-                    guard let url = urls.first else { return false }
-                    Task { await loadImage(from: url) }
-                    return true
+            Button {
+                showsFileImporter = true
+            } label: {
+                ZStack(alignment: .bottom) {
+                    coverPreview
+
+                    Text(localized(hasCover ? "Replace Cover" : "Choose Cover"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(.black.opacity(0.72))
+                        .opacity(coverActionIsVisible ? 1 : 0)
                 }
-                .accessibilityLabel("Cover")
-                .accessibilityHint("Drop an image file here")
+                .frame(width: 240, height: 360)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .focused($coverButtonIsFocused)
+            .overlay {
+                if coverButtonIsFocused {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.accentColor, lineWidth: 2)
+                }
+            }
+            .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: coverActionIsVisible)
+            .onHover { coverIsHovered = $0 }
+            .dropDestination(for: URL.self) { urls, _ in
+                guard let url = urls.first else { return false }
+                Task { await loadImage(from: url) }
+                return true
+            }
+            .contextMenu {
+                Button("Paste", systemImage: "clipboard") {
+                    pasteImage()
+                }
+
+                if hasCover {
+                    Button("Remove Cover", systemImage: "trash", role: .destructive) {
+                        removeCover()
+                    }
+                }
+            }
+            .help(localized(hasCover ? "Replace Cover" : "Choose Cover"))
+            .accessibilityLabel(localized(hasCover ? "Replace Cover" : "Choose Cover"))
+            .accessibilityHint("Opens an image picker. You can also drop or paste an image.")
 
             HStack(spacing: 2) {
-                Button {
-                    showsFileImporter = true
-                } label: {
-                    Image(systemName: "photo.badge.plus")
-                        .frame(width: 40, height: 40)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help("Choose…")
-                .accessibilityLabel("Choose…")
-
                 Button {
                     pasteImage()
                 } label: {
@@ -120,21 +156,19 @@ struct MovieEditorView: View {
                         .frame(width: 40, height: 40)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .keyboardShortcut("v", modifiers: [.command, .shift])
+                .buttonStyle(.borderless)
                 .help("Paste")
                 .accessibilityLabel("Paste")
 
                 if hasCover {
                     Button(role: .destructive) {
-                        pendingCoverData = nil
-                        removesExistingCover = true
+                        removeCover()
                     } label: {
                         Image(systemName: "trash")
                             .frame(width: 40, height: 40)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.borderless)
                     .help("Remove Cover")
                     .accessibilityLabel("Remove Cover")
                 }
@@ -190,7 +224,7 @@ struct MovieEditorView: View {
                         .frame(width: 40, height: 40)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .help(localized(isFavorite ? "Remove from Favorites" : "Add to Favorites"))
                 .accessibilityLabel(localized(isFavorite ? "Remove from Favorites" : "Add to Favorites"))
                 .accessibilityValue(localized(isFavorite ? "Favorite" : "Not Favorite"))
@@ -204,7 +238,8 @@ struct MovieEditorView: View {
                     .font(.title3.weight(.medium))
                     .padding(.horizontal, 12)
                     .frame(minHeight: 44)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(editorFieldSurface(isFocused: focusedField == .title))
+                    .focused($focusedField, equals: .title)
                     .accessibilityLabel("Title")
             }
             .padding(.top, 12)
@@ -250,7 +285,8 @@ struct MovieEditorView: View {
                     .textFieldStyle(.plain)
                     .lineLimit(5...10)
                     .padding(12)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(editorFieldSurface(isFocused: focusedField == .synopsis))
+                    .focused($focusedField, equals: .synopsis)
                     .accessibilityLabel("Description")
             }
             .padding(.top, 22)
@@ -473,6 +509,17 @@ struct MovieEditorView: View {
             .textCase(.uppercase)
     }
 
+    private func editorFieldSurface(isFocused: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(.quaternary)
+            .overlay {
+                if isFocused {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.accentColor, lineWidth: 2)
+                }
+            }
+    }
+
     private var footer: some View {
         HStack {
             Spacer()
@@ -500,6 +547,10 @@ struct MovieEditorView: View {
 
     private var hasCover: Bool {
         pendingCoverData != nil || (!removesExistingCover && movie?.coverFilename != nil)
+    }
+
+    private var coverActionIsVisible: Bool {
+        coverIsHovered || coverButtonIsFocused
     }
 
     private var isValid: Bool {
@@ -810,5 +861,10 @@ struct MovieEditorView: View {
     private func applyPendingCover(_ data: Data) {
         pendingCoverData = data
         removesExistingCover = false
+    }
+
+    private func removeCover() {
+        pendingCoverData = nil
+        removesExistingCover = true
     }
 }

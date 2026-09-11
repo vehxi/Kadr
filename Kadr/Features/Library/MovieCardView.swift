@@ -78,7 +78,7 @@ struct MovieCardView: View {
                 value: isHovering
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
         .onHover { isHovering = $0 }
         .accessibilityLabel(accessibilityDescription)
     }
