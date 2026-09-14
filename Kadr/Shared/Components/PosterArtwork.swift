@@ -5,13 +5,14 @@ struct PosterArtwork: View {
     let title: String
     let filename: String?
     var mediaKind: MediaKind = .movie
+    var cornerRadius: CGFloat = 10
 
     @State private var image: NSImage?
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(.quaternary)
 
                 if let image {
@@ -29,9 +30,9 @@ struct PosterArtwork: View {
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(.primary.opacity(0.08))
             }
         }

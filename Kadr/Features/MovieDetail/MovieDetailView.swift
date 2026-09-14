@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MovieDetailView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.modelContext) private var modelContext
 
@@ -20,24 +21,28 @@ struct MovieDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 32) {
-                    poster(width: 250, height: 375)
+        HStack(spacing: 0) {
+            PosterArtwork(
+                title: movie.title,
+                filename: movie.coverFilename,
+                mediaKind: movie.mediaKind,
+                cornerRadius: 0
+            )
+            .aspectRatio(2 / 3, contentMode: .fill)
+            .frame(width: 346, height: 520)
 
+            VStack(spacing: 0) {
+                ScrollView {
                     details
-                        .frame(minWidth: 420)
+                        .padding(28)
                 }
 
-                VStack(spacing: 24) {
-                    poster(width: 180, height: 270)
-                    details
-                }
+                Divider()
+                actions
             }
-            .padding(32)
-            .frame(maxWidth: 1040, alignment: .topLeading)
-            .frame(maxWidth: .infinity, alignment: .top)
+            .frame(maxWidth: .infinity)
         }
+        .frame(width: 780, height: 520)
         .sheet(isPresented: $showsEditor) {
             MovieEditorView(movie: movie)
                 .environment(\.locale, locale)
@@ -58,16 +63,6 @@ struct MovieDetailView: View {
         } message: {
             Text(errorMessage ?? "")
         }
-    }
-
-    private func poster(width: CGFloat, height: CGFloat) -> some View {
-        PosterArtwork(
-            title: movie.title,
-            filename: movie.coverFilename,
-            mediaKind: movie.mediaKind
-        )
-        .frame(width: width, height: height)
-        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
     }
 
     private var details: some View {
@@ -135,9 +130,16 @@ struct MovieDetailView: View {
 
             Spacer(minLength: 24)
 
-            HStack(spacing: 16) {
-                Text("Added \(movie.createdAt, format: .dateTime.day().month().year())")
-                Text("Updated \(movie.updatedAt, format: .dateTime.day().month().year())")
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 16) {
+                    addedDate
+                    updatedDate
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    addedDate
+                    updatedDate
+                }
             }
             .font(.caption)
             .foregroundStyle(.primary.opacity(0.65))
@@ -205,39 +207,56 @@ struct MovieDetailView: View {
     }
 
     private var controlStrip: some View {
-        HStack(spacing: 14) {
-            Menu {
-                ForEach(ViewingStatus.allCases) { status in
-                    Button {
-                        statusBinding.wrappedValue = status
-                    } label: {
-                        Label(status.titleKey, systemImage: status.systemImage)
-                    }
-                }
-            } label: {
-                HStack(spacing: 7) {
-                    Image(systemName: movie.status.systemImage)
-                    Text(movie.status.titleKey)
-                        .lineLimit(1)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .font(.subheadline.weight(.medium))
-                .contentShape(Rectangle())
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 14) {
+                statusMenu
+                Spacer(minLength: 10)
+                StarRating(rating: ratingBinding)
             }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
-            .accessibilityLabel("Status")
+            .padding(.leading, 14)
+            .padding(.trailing, 8)
+            .frame(minHeight: 48)
 
-            Spacer(minLength: 10)
+            VStack(alignment: .leading, spacing: 0) {
+                statusMenu
+                    .padding(.horizontal, 14)
+                    .frame(height: 44)
 
-            StarRating(rating: ratingBinding)
+                Divider()
+                    .padding(.horizontal, 14)
+
+                StarRating(rating: ratingBinding)
+                    .padding(.horizontal, 8)
+                    .frame(height: 44)
+            }
         }
-        .padding(.leading, 14)
-        .padding(.trailing, 8)
-        .frame(minHeight: 48)
         .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private var statusMenu: some View {
+        Menu {
+            ForEach(ViewingStatus.allCases) { status in
+                Button {
+                    statusBinding.wrappedValue = status
+                } label: {
+                    Label(status.titleKey, systemImage: status.systemImage)
+                }
+            }
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: movie.status.systemImage)
+                Text(movie.status.titleKey)
+                    .lineLimit(1)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .font(.subheadline.weight(.medium))
+            .contentShape(Rectangle())
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .accessibilityLabel("Status")
     }
 
     private func sectionTitle(_ key: LocalizedStringKey) -> some View {
@@ -309,6 +328,27 @@ struct MovieDetailView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private var actions: some View {
+        HStack {
+            Spacer()
+            Button("Done") {
+                dismiss()
+            }
+            .keyboardShortcut(.cancelAction)
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+    }
+
+    private var addedDate: some View {
+        Text("Added \(movie.createdAt, format: .dateTime.day().month().year())")
+    }
+
+    private var updatedDate: some View {
+        Text("Updated \(movie.updatedAt, format: .dateTime.day().month().year())")
     }
 
     private var statusBinding: Binding<ViewingStatus> {

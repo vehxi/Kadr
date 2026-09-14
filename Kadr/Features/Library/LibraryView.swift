@@ -8,7 +8,7 @@ struct LibraryView: View {
     @Query(sort: \Movie.updatedAt, order: .reverse) private var movies: [Movie]
 
     @State private var selection: LibraryFilter? = .all
-    @State private var navigationPath: [UUID] = []
+    @State private var selectedMovie: Movie?
     @State private var showsAddEditor = false
     @State private var startupError: String?
 
@@ -21,32 +21,28 @@ struct LibraryView: View {
             sidebar
                 .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
         } detail: {
-            NavigationStack(path: $navigationPath) {
-                content
-                    .navigationTitle(selectionTitle)
-                    .background(WindowTitleUpdater(title: selectionTitle))
-                    .toolbar {
-                        ToolbarItem(placement: .primaryAction) {
-                            Button {
-                                presentAddMovie()
-                            } label: {
-                                Label("Add Title", systemImage: "plus")
-                            }
-                            .keyboardShortcut("n", modifiers: .command)
-                            .help("Add Title")
+            content
+                .navigationTitle(selectionTitle)
+                .background(WindowTitleUpdater(title: selectionTitle))
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            presentAddMovie()
+                        } label: {
+                            Label("Add Title", systemImage: "plus")
                         }
+                        .keyboardShortcut("n", modifiers: .command)
+                        .help("Add Title")
                     }
-                    .navigationDestination(for: UUID.self) { movieID in
-                        if let movie = movie(withID: movieID) {
-                            MovieDetailView(movie: movie) {
-                                navigationPath.removeAll()
-                            }
-                            .navigationTitle(movie.title)
-                        }
-                    }
-            }
+                }
         }
         .navigationSplitViewStyle(.balanced)
+        .sheet(item: $selectedMovie) { movie in
+            MovieDetailView(movie: movie) {
+                selectedMovie = nil
+            }
+            .environment(\.locale, locale)
+        }
         .sheet(isPresented: $showsAddEditor) {
             MovieEditorView()
                 .environment(\.locale, locale)
@@ -68,12 +64,9 @@ struct LibraryView: View {
         } message: {
             Text(startupError ?? "")
         }
-        .onChange(of: selection) {
-            navigationPath.removeAll()
-        }
         .onChange(of: movies.map(\.id)) { _, movieIDs in
-            if navigationPath.contains(where: { !movieIDs.contains($0) }) {
-                navigationPath.removeAll()
+            if let selectedMovie, !movieIDs.contains(selectedMovie.id) {
+                self.selectedMovie = nil
             }
         }
     }
@@ -187,10 +180,6 @@ struct LibraryView: View {
         }
     }
 
-    private func movie(withID id: UUID) -> Movie? {
-        movies.first { $0.id == id }
-    }
-
     private var selectionTitle: String {
         switch selection ?? .all {
         case .all:
@@ -260,7 +249,7 @@ struct LibraryView: View {
     }
 
     private func showDetails(for movie: Movie) {
-        navigationPath = [movie.id]
+        selectedMovie = movie
     }
 }
 
