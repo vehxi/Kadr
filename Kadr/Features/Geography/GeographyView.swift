@@ -64,7 +64,7 @@ struct GeographyView: View {
 
                     if !statistics.missingCountries.isEmpty {
                         DisclosureGroup {
-                            VStack(alignment: .leading, spacing: 4) {
+                            LazyVStack(alignment: .leading, spacing: 4) {
                                 Text("Open a title and edit its production countries to add it to the map.")
                                     .font(.caption).foregroundStyle(EducaColor.secondaryText)
                                 ForEach(statistics.missingCountries) { movie in
@@ -217,7 +217,7 @@ struct GeographyView: View {
                 Spacer(minLength: 0)
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(statistics.films) { film in
                             Button { openMovie(film) } label: {
                                 HStack(alignment: .center, spacing: 10) {

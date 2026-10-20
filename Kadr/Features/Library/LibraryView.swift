@@ -15,7 +15,6 @@ struct LibraryView: View {
     @State private var selectedMovie: Movie?
     @State private var showsAddEditor = false
     @State private var startupError: String?
-    @State private var sidebarReflections: [SidebarReflection] = []
 
     private let grid = [
         GridItem(.adaptive(minimum: 180, maximum: 240), spacing: 24, alignment: .top)
@@ -23,10 +22,6 @@ struct LibraryView: View {
 
     init(initialSelection: LibraryFilter = .all) {
         _selection = State(initialValue: initialSelection)
-    }
-
-    private var showsTierReflections: Bool {
-        selection == .tierList && !movies.isEmpty && !reduceTransparency
     }
 
     var body: some View {
@@ -90,8 +85,6 @@ struct LibraryView: View {
                 }
         }
         .navigationSplitViewStyle(.balanced)
-        .coordinateSpace(name: SidebarReflection.coordinateSpace)
-        .onPreferenceChange(SidebarReflectionPreferenceKey.self) { sidebarReflections = $0 }
         .toolbar(removing: .sidebarToggle)
         .toolbarBackground(.hidden, for: .windowToolbar)
         .sheet(item: $selectedMovie) { movie in
@@ -195,7 +188,7 @@ struct LibraryView: View {
                 .padding(8)
         }
         .background {
-            EducaSidebarSurface(reduceTransparency: reduceTransparency, reflections: showsTierReflections ? sidebarReflections : [])
+            EducaSidebarSurface(reduceTransparency: reduceTransparency)
                 .ignoresSafeArea(.container)
         }
         .navigationTitle("My Library")

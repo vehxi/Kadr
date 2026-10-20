@@ -3,7 +3,6 @@ import SwiftUI
 
 struct EducaSidebarSurface: View {
     let reduceTransparency: Bool
-    var reflections: [SidebarReflection] = []
 
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -11,12 +10,6 @@ struct EducaSidebarSurface: View {
                 EducaColor.raised
             } else {
                 NativeSidebarMaterial()
-                GeometryReader { geometry in
-                    SidebarReflectionLayer(
-                        reflections: reflections,
-                        originY: geometry.frame(in: .named(SidebarReflection.coordinateSpace)).minY
-                    )
-                }
             }
 
             Rectangle()

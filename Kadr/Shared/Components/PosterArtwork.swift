@@ -1,6 +1,11 @@
 import AppKit
 import SwiftUI
 
+extension EnvironmentValues {
+    @Entry var coverStore: CoverStore = .shared
+    @Entry var coverThumbnailLoader: CoverThumbnailLoader = .shared
+}
+
 struct PosterArtwork: View {
     let title: String
     let filename: String?
@@ -8,7 +13,16 @@ struct PosterArtwork: View {
     var cornerRadius: CGFloat = 10
 
     @Environment(\.locale) private var locale
+    @Environment(\.displayScale) private var displayScale
+    @Environment(\.coverStore) private var coverStore
+    @Environment(\.coverThumbnailLoader) private var thumbnailLoader
     @State private var image: NSImage?
+    @State private var loadedFilename: String?
+
+    private struct LoadRequest: Hashable {
+        let filename: String?
+        let size: CoverThumbnailSize?
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -34,9 +48,13 @@ struct PosterArtwork: View {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(EducaColor.border)
             }
-        }
-        .task(id: filename) {
-            await loadImage()
+            .task(id: LoadRequest(filename: filename, size: CoverThumbnailSize.forView(geometry.size, scale: displayScale))) {
+                await loadImage(size: CoverThumbnailSize.forView(geometry.size, scale: displayScale))
+            }
+            .onDisappear {
+                image = nil
+                loadedFilename = nil
+            }
         }
     }
 
@@ -66,14 +84,18 @@ struct PosterArtwork: View {
     }
 
     @MainActor
-    private func loadImage() async {
-        guard let filename,
-              let url = await CoverStore.shared.url(for: filename)
+    private func loadImage(size: CoverThumbnailSize?) async {
+        if loadedFilename != filename { image = nil }
+        guard let filename, let size,
+              let url = await coverStore.url(for: filename)
         else {
             image = nil
             return
         }
-        image = NSImage(contentsOf: url)
+        let thumbnail = await thumbnailLoader.image(at: url, size: size)
+        guard !Task.isCancelled else { return }
+        image = thumbnail.map { NSImage(cgImage: $0, size: NSSize(width: $0.width, height: $0.height)) }
+        loadedFilename = filename
     }
 }
 

@@ -10,6 +10,8 @@ struct TierListView: View {
     @State private var saveError: String?
 
     var body: some View {
+        // Read each model's tier once per update, not twice per visible lane.
+        let groupedMovies = Dictionary(grouping: movies, by: \.tier)
         Group {
             if movies.isEmpty {
                 ContentUnavailableView {
@@ -23,10 +25,10 @@ struct TierListView: View {
                         intro
 
                         ForEach(MovieTier.allCases) { tier in
-                            tierLane(tier)
+                            tierLane(tier, movies: groupedMovies[tier] ?? [])
                         }
 
-                        unrankedLane
+                        unrankedLane(movies: groupedMovies[nil] ?? [])
                     }
                     .padding(EducaSpace.page)
                 }
@@ -58,36 +60,28 @@ struct TierListView: View {
         .padding(.bottom, 8)
     }
 
-    private func tierLane(_ tier: MovieTier) -> some View {
+    private func tierLane(_ tier: MovieTier, movies: [Movie]) -> some View {
         TierLane(
             title: tier.label,
-            subtitle: "\(movies(in: tier).count)",
+            subtitle: "\(movies.count)",
             color: tier.color,
-            movies: movies(in: tier),
+            movies: movies,
             openMovie: openMovie,
             move: move,
             onDrop: { move(movieID: $0, to: tier) }
         )
     }
 
-    private var unrankedLane: some View {
+    private func unrankedLane(movies: [Movie]) -> some View {
         TierLane(
             title: "—",
             subtitle: String(localized: "Unranked"),
             color: nil,
-            movies: unrankedMovies,
+            movies: movies,
             openMovie: openMovie,
             move: move,
             onDrop: { move(movieID: $0, to: nil) }
         )
-    }
-
-    private var unrankedMovies: [Movie] {
-        movies.filter { $0.tier == nil }
-    }
-
-    private func movies(in tier: MovieTier) -> [Movie] {
-        movies.filter { $0.tier == tier }
     }
 
     private func move(_ movie: Movie, to tier: MovieTier?) {
@@ -159,21 +153,16 @@ private struct TierLane: View {
             }
             .frame(width: 88)
             .frame(maxHeight: .infinity)
-            .background(color ?? EducaColor.secondaryButton)
             .background {
-                if let color {
-                    GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: SidebarReflectionPreferenceKey.self,
-                            value: [SidebarReflection(
-                                id: title, color: color,
-                                frame: geometry.frame(in: .named(SidebarReflection.coordinateSpace))
-                            )]
-                        )
-                    }
-                }
+                UnevenRoundedRectangle(
+                    topLeadingRadius: EducaRadius.panel,
+                    bottomLeadingRadius: EducaRadius.panel,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 0,
+                    style: .continuous
+                )
+                .fill(color ?? EducaColor.secondaryButton)
             }
-
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 14) {
                     if movies.isEmpty {

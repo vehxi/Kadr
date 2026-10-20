@@ -12,7 +12,13 @@ import Testing
 /// Isolated visual fixtures: never open or modify the user's on-disk library.
 @MainActor
 struct EducaScreenRenderingTests {
+    private let coverDirectory = FileManager.default.temporaryDirectory
+        .appendingPathComponent("kadr-render-covers-\(UUID())", isDirectory: true)
+    private var fixtureCoverStore: CoverStore { CoverStore(directoryURL: coverDirectory) }
+    private let fixtureThumbnailLoader = CoverThumbnailLoader()
+
     @Test func renderRussianScreensInBothThemes() async throws {
+        defer { try? FileManager.default.removeItem(at: coverDirectory) }
         let container = try PersistenceController.makeContainer(inMemory: true)
         let emptyContainer = try PersistenceController.makeContainer(inMemory: true)
         let genres = [Genre(name: "Драма"), Genre(name: "Научная фантастика"), Genre(name: "Альтернативная история")]
@@ -23,6 +29,7 @@ struct EducaScreenRenderingTests {
             synopsis: "Длинное русское описание для проверки переносов. Герои путешествуют по миру и собирают истории людей, которых встречают в пути. Тихий фильм о памяти, дружбе и неожиданном возвращении домой.",
             tier: .s, genres: genres, countryCodes: ["JP", "GB", "US"]
         )
+        movie.coverFilename = try await fixtureCoverStore.write(makeCoverJPEG())
         container.mainContext.insert(movie)
         container.mainContext.insert(Movie(title: "Просмотренный фильм, для которого ещё не выбраны страны производства", status: .watched))
         try container.mainContext.save()
@@ -52,18 +59,16 @@ struct EducaScreenRenderingTests {
                 name: "\(name)-settings-checking", size: CGSize(width: 680, height: 240), scheme: scheme, container: emptyContainer, directory: directory)
             try await render(GenreSettingsView(), name: "\(name)-settings-genres", size: CGSize(width: 680, height: 560), scheme: scheme, container: container, directory: directory)
             try await render(LibraryView(), name: "\(name)-library-sidebar", size: CGSize(width: 1080, height: 760), scheme: scheme, container: container, directory: directory)
-            try verifySidebarReflection(directory.appendingPathComponent("\(name)-library-sidebar.png"), expected: false)
+            try verifyNeutralSidebar(directory.appendingPathComponent("\(name)-library-sidebar.png"))
             try await render(LibraryView(initialSelection: .tierList), name: "\(name)-tiers-sidebar", size: CGSize(width: 1080, height: 760), scheme: scheme, container: container, directory: directory)
-            try verifySidebarReflection(directory.appendingPathComponent("\(name)-tiers-sidebar.png"), expected: true)
+            try verifyNeutralSidebar(directory.appendingPathComponent("\(name)-tiers-sidebar.png"))
             try await render(HStack(spacing: 0) {
-                EducaSidebarSurface(reduceTransparency: true, reflections: [
-                    SidebarReflection(id: "S", color: .red, frame: CGRect(x: 252, y: 80, width: 88, height: 196))
-                ])
+                EducaSidebarSurface(reduceTransparency: true)
                     .overlay(alignment: .topLeading) { Text("Медиатека · Library").padding(24) }
                     .frame(width: 220)
                 EducaColor.canvas
             }, name: "\(name)-opaque-sidebar-surface", size: CGSize(width: 640, height: 400), scheme: scheme, container: emptyContainer, directory: directory)
-            try verifySidebarReflection(directory.appendingPathComponent("\(name)-opaque-sidebar-surface.png"), expected: false, width: 640)
+            try verifyNeutralSidebar(directory.appendingPathComponent("\(name)-opaque-sidebar-surface.png"), width: 640)
             try await render(MovieDetailView(movie: movie, onDelete: {}), name: "\(name)-detail", size: CGSize(width: 1_000, height: 600), scheme: scheme, container: container, directory: directory)
             try await render(MovieEditorView(movie: movie), name: "\(name)-editor", size: CGSize(width: 940, height: 680), scheme: scheme, container: container, directory: directory)
             try await render(TierListView(movies: [movie], openMovie: { _ in }), name: "\(name)-tiers", size: CGSize(width: 820, height: 720), scheme: scheme, container: container, directory: directory)
@@ -77,6 +82,7 @@ struct EducaScreenRenderingTests {
             try await render(GeographyView(loadGeometry: { throw CocoaError(.fileReadCorruptFile) }), name: "\(name)-error", size: CGSize(width: 640, height: 400), scheme: scheme, container: container, directory: directory)
             try await render(GenreSettingsView(), name: "\(name)-empty-genres", size: CGSize(width: 720, height: 600), scheme: scheme, container: emptyContainer, directory: directory)
         }
+        #expect(await fixtureThumbnailLoader.decodeCount > 0, "Visual fixtures must actually load their isolated covers")
         print("Educa visual fixtures: \(directory.path)")
     }
 
@@ -85,12 +91,9 @@ struct EducaScreenRenderingTests {
         let bitmap = try #require(NSBitmapImageRep(data: Data(contentsOf: url)))
         let scale = CGFloat(bitmap.pixelsWide) / 820
         for tier in MovieTier.allCases {
-            // x=48 is well inside the 88pt label and outside its centered text.
-            let x = Int(48 * scale)
-            let coloredRows = (0..<bitmap.pixelsHigh).filter { y in
-                guard let pixel = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { return false }
+            func matches(_ pixel: NSColor?) -> Bool {
+                guard let pixel = pixel?.usingColorSpace(.sRGB) else { return false }
                 let (r, g, b) = (pixel.redComponent, pixel.greenComponent, pixel.blueComponent)
-                // Match the hue, not exact RGB: PNG/AppKit color management changes channel values.
                 return switch tier {
                 case .s: r > g + 0.3 && r > b + 0.3 && abs(g - b) < 0.2
                 case .a: r > g + 0.15 && g > b + 0.2
@@ -98,25 +101,48 @@ struct EducaScreenRenderingTests {
                 case .c: g > r + 0.2 && g > b + 0.15
                 case .d: b > r + 0.3 && b > g + 0.15
                 }
+            }
+            // x=48 is well inside the 88pt label and outside its centered text.
+            let x = Int(48 * scale)
+            let coloredRows = (0..<bitmap.pixelsHigh).filter { y in
+                // Match the hue, not exact RGB: PNG/AppKit color management changes channel values.
+                matches(bitmap.colorAt(x: x, y: y))
             }.count
             #expect(CGFloat(coloredRows) >= 160 * scale, "Full-height fill missing for tier \(tier.label) in \(scheme)")
+            let fullHeightRows = (0..<bitmap.pixelsHigh).filter { matches(bitmap.colorAt(x: Int(80 * scale), y: $0)) }
+            let top = try #require(fullHeightRows.first)
+            let bottom = try #require(fullHeightRows.last)
+            for y in [top + Int(4 * scale), bottom - Int(4 * scale)] {
+                #expect(matches(bitmap.colorAt(x: Int(117 * scale), y: y)), "Right rank corners must be square")
+                #expect(!matches(bitmap.colorAt(x: Int(35 * scale), y: y)), "Left rank corners must stay rounded")
+            }
         }
     }
 
-    private func verifySidebarReflection(_ url: URL, expected: Bool, width: CGFloat = 1080) throws {
+    private func verifyNeutralSidebar(_ url: URL, width: CGFloat = 1080) throws {
         let bitmap = try #require(NSBitmapImageRep(data: Data(contentsOf: url)))
         let scale = CGFloat(bitmap.pixelsWide) / width
-        let x = Int(200 * scale)
+        let x = Int(214 * scale)
         let reflectedRows = (0..<bitmap.pixelsHigh).filter { y in
             guard let pixel = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { return false }
-            return pixel.redComponent > pixel.greenComponent + 0.05
-                && pixel.redComponent > pixel.blueComponent + 0.05
+            let tint = min(pixel.redComponent - pixel.greenComponent, pixel.redComponent - pixel.blueComponent)
+            return tint > 0.008
         }.count
-        if expected {
-            #expect(CGFloat(reflectedRows) > 60 * scale, "Tier color should be reflected inside the sidebar")
-        } else {
-            #expect(reflectedRows == 0, "Reflections must be absent outside the tier list or with reduced transparency")
-        }
+        #expect(reflectedRows == 0, "The sidebar must stay neutral, including on the tier list")
+    }
+
+    private func makeCoverJPEG() throws -> Data {
+        let context = try #require(CGContext(data: nil, width: 800, height: 1200, bitsPerComponent: 8,
+            bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        let gradient = try #require(CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: [
+            CGColor(red: 0.05, green: 0.25, blue: 0.5, alpha: 1),
+            CGColor(red: 0.9, green: 0.55, blue: 0.3, alpha: 1)
+        ] as CFArray, locations: [0, 1]))
+        context.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: 800, y: 1200), options: [])
+        context.setFillColor(CGColor(gray: 1, alpha: 0.85))
+        context.fill(CGRect(x: 300, y: 500, width: 200, height: 200))
+        let image = try #require(context.makeImage())
+        return try #require(NSBitmapImageRep(cgImage: image).representation(using: .jpeg, properties: [.compressionFactor: 0.85]))
     }
 
     private func render<V: View>(
@@ -131,6 +157,8 @@ struct EducaScreenRenderingTests {
             .background { EducaCanvas() }
             .environment(\.locale, locale)
             .environment(\.colorScheme, scheme)
+            .environment(\.coverStore, fixtureCoverStore)
+            .environment(\.coverThumbnailLoader, fixtureThumbnailLoader)
             .modelContainer(container)
         let host = NSHostingView(rootView: root)
         let window = NSWindow(contentRect: CGRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
@@ -139,6 +167,12 @@ struct EducaScreenRenderingTests {
         window.contentView = host
         host.frame = CGRect(origin: .zero, size: size)
         defer { window.close() }
+        let preview = ProcessInfo.processInfo.environment["KADR_RENDER_PREVIEW"] == name
+        if preview {
+            window.styleMask = [.titled, .closable, .resizable]
+            window.title = "Kadr · isolated visual fixture"
+            window.makeKeyAndOrderFront(nil)
+        }
         // Allow SwiftUI's layout and @Query updates to settle without presenting a window.
         await Task.yield()
         try await Task.sleep(for: .milliseconds(120))
@@ -149,5 +183,9 @@ struct EducaScreenRenderingTests {
         #expect(bitmap.pixelsWide >= Int(size.width))
         #expect(bitmap.pixelsHigh >= Int(size.height))
         try png.write(to: directory.appendingPathComponent("\(name).png"))
+        if preview {
+            // Opt-in manual QA only. Regular test runs never present a window or pause here.
+            try await Task.sleep(for: .seconds(60))
+        }
     }
 }
