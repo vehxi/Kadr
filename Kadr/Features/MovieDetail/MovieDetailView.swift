@@ -28,24 +28,25 @@ struct MovieDetailView: View {
                 mediaKind: movie.mediaKind,
                 cornerRadius: 0
             )
-            .aspectRatio(2 / 3, contentMode: .fill)
-            .frame(width: 346, height: 520)
+            .frame(width: 400, height: 600)
 
             VStack(spacing: 0) {
                 ScrollView {
                     details
-                        .padding(28)
+                        .padding(EducaSpace.page)
                 }
 
-                Divider()
+                EducaDivider()
                 actions
             }
             .frame(maxWidth: .infinity)
+            .background(EducaColor.panel)
         }
-        .frame(width: 780, height: 520)
+        .frame(width: 1_000, height: 600)
         .sheet(isPresented: $showsEditor) {
             MovieEditorView(movie: movie)
                 .environment(\.locale, locale)
+                .educaRoot()
         }
         .alert(
             localized(movie.mediaKind == .series ? "Delete Series?" : "Delete Movie?"),
@@ -70,8 +71,7 @@ struct MovieDetailView: View {
             HStack(alignment: .top, spacing: 16) {
                 VStack(alignment: .leading, spacing: 7) {
                     Text(movie.title)
-                        .font(.largeTitle.weight(.semibold))
-                        .tracking(-0.5)
+                        .educaScreenTitle()
                         .fixedSize(horizontal: false, vertical: true)
                         .textSelection(.enabled)
 
@@ -79,13 +79,13 @@ struct MovieDetailView: View {
                         Label(movie.mediaKind.titleKey, systemImage: movie.mediaKind.systemImage)
                         if let releasePeriodText = movie.releasePeriodText {
                             Text("•")
-                                .foregroundStyle(.quaternary)
+                                .foregroundStyle(EducaColor.mutedText)
                             Text(releasePeriodText)
                                 .monospacedDigit()
                         }
                     }
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
                 }
 
                 Spacer(minLength: 8)
@@ -94,6 +94,18 @@ struct MovieDetailView: View {
 
             controlStrip
                 .padding(.top, 22)
+
+            VStack(alignment: .leading, spacing: 9) {
+                sectionTitle("Production Countries")
+                if movie.countryCodes.isEmpty {
+                    Text("Not Specified").foregroundStyle(EducaColor.secondaryText)
+                } else {
+                    Text(movie.countryCodes.map { ProductionCountries.name(for: $0, locale: locale) }.joined(separator: ", "))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+                }
+            }
+            .padding(.top, 20)
 
             if !movie.genres.isEmpty {
                 VStack(alignment: .leading, spacing: 9) {
@@ -104,7 +116,7 @@ struct MovieDetailView: View {
                                 .font(.caption.weight(.medium))
                                 .padding(.horizontal, 9)
                                 .padding(.vertical, 5)
-                                .background(.quaternary, in: Capsule())
+                                .background(EducaColor.secondaryButton, in: Capsule())
                         }
                     }
                 }
@@ -120,8 +132,8 @@ struct MovieDetailView: View {
                 VStack(alignment: .leading, spacing: 9) {
                     sectionTitle("Description")
                     Text(movie.synopsis)
-                        .font(.body)
-                        .lineSpacing(2)
+                        .font(EducaType.body)
+                        .lineSpacing(4)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -142,7 +154,7 @@ struct MovieDetailView: View {
                 }
             }
             .font(.caption)
-            .foregroundStyle(.primary.opacity(0.65))
+            .foregroundStyle(EducaColor.secondaryText)
             .monospacedDigit()
         }
         .frame(maxWidth: .infinity, minHeight: 375, alignment: .topLeading)
@@ -166,7 +178,7 @@ struct MovieDetailView: View {
                     .frame(width: 40, height: 40)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(EducaButtonStyle(kind: .icon))
             .help(localized(movie.isFavorite ? "Remove from Favorites" : "Add to Favorites"))
             .accessibilityLabel(localized(movie.isFavorite ? "Remove from Favorites" : "Add to Favorites"))
             .accessibilityValue(localized(movie.isFavorite ? "Favorite" : "Not Favorite"))
@@ -176,11 +188,11 @@ struct MovieDetailView: View {
             } label: {
                 Image(systemName: "pencil")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
                     .frame(width: 40, height: 40)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(EducaButtonStyle(kind: .icon))
             .help("Edit")
             .accessibilityLabel("Edit")
 
@@ -193,7 +205,7 @@ struct MovieDetailView: View {
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
                     .frame(width: 40, height: 40)
                     .contentShape(Rectangle())
             }
@@ -222,7 +234,7 @@ struct MovieDetailView: View {
                     .padding(.horizontal, 14)
                     .frame(height: 44)
 
-                Divider()
+                EducaDivider()
                     .padding(.horizontal, 14)
 
                 StarRating(rating: ratingBinding)
@@ -230,7 +242,7 @@ struct MovieDetailView: View {
                     .frame(height: 44)
             }
         }
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(EducaFieldSurface())
     }
 
     private var statusMenu: some View {
@@ -249,7 +261,7 @@ struct MovieDetailView: View {
                     .lineLimit(1)
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
             }
             .font(.subheadline.weight(.medium))
             .contentShape(Rectangle())
@@ -261,8 +273,9 @@ struct MovieDetailView: View {
 
     private func sectionTitle(_ key: LocalizedStringKey) -> some View {
         Text(key)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
+            .font(EducaType.label)
+            .tracking(0.8)
+            .foregroundStyle(EducaColor.secondaryText)
             .textCase(.uppercase)
     }
 
@@ -274,7 +287,7 @@ struct MovieDetailView: View {
                 Spacer()
                 Text("\(movie.watchedEpisodeCount) of \(movie.episodeCount)")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
                     .monospacedDigit()
             }
 
@@ -297,7 +310,7 @@ struct MovieDetailView: View {
                             ) {
                                 setSeason(season, watched: season.watchedEpisodeCount != season.episodes.count)
                             }
-                            .buttonStyle(.borderless)
+                            .buttonStyle(EducaButtonStyle())
                         }
 
                         ForEach(season.sortedEpisodes) { episode in
@@ -306,7 +319,7 @@ struct MovieDetailView: View {
                                     Text("Episode \(episode.number)")
                                     if !episode.title.isEmpty {
                                         Text(episode.title)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(EducaColor.secondaryText)
                                             .lineLimit(1)
                                     }
                                 }
@@ -321,7 +334,7 @@ struct MovieDetailView: View {
                             .font(.subheadline.weight(.medium))
                         Spacer()
                         Text("\(season.watchedEpisodeCount)/\(season.episodes.count)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                             .monospacedDigit()
                     }
                 }
@@ -337,10 +350,10 @@ struct MovieDetailView: View {
                 dismiss()
             }
             .keyboardShortcut(.cancelAction)
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(EducaButtonStyle(kind: .primary))
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, EducaSpace.page)
+        .padding(.vertical, EducaSpace.lg)
     }
 
     private var addedDate: some View {

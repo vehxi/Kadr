@@ -44,7 +44,7 @@
 			path = Kadr;
 			sourceTree = "<group>";
 		};
-		100000000000000000000041 /* KadrTests */ = {
+		100000000000000000000041 /* Tests/KadrTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Tests/KadrTests;
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000040 /* Kadr */,
-				100000000000000000000041 /* KadrTests */,
+				100000000000000000000041 /* Tests/KadrTests */,
 				100000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -128,7 +128,7 @@
 				100000000000000000000061 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				100000000000000000000041 /* KadrTests */,
+				100000000000000000000041 /* Tests/KadrTests */,
 			);
 			name = KadrTests;
 			packageProductDependencies = (
@@ -333,7 +333,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5000;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -346,7 +346,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.4.5;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vehxi.MyMovies;
 				PRODUCT_MODULE_NAME = MyMovies;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -367,7 +367,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5000;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -380,7 +380,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.4.5;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vehxi.MyMovies;
 				PRODUCT_MODULE_NAME = MyMovies;
 				PRODUCT_NAME = "$(TARGET_NAME)";

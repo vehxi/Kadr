@@ -2,166 +2,145 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
     @ObservedObject var updateController: UpdateController
-    @AppStorage("appLanguage") private var appLanguageRawValue = AppLanguage.system.rawValue
+    @AppStorage("appLanguage") private var appLanguage = AppLanguage.system.rawValue
+    @AppStorage("appAppearance") private var appearance = AppAppearance.system.rawValue
+
+    var body: some View {
+        GeneralSettingsContent(appearance: $appearance, appLanguage: $appLanguage) {
+            UpdateSettingsSection(updateController: updateController)
+        }
+    }
+}
+
+/// Keep the layout independent of Sparkle: rendering fixtures never start an updater.
+struct GeneralSettingsContent<Updates: View>: View {
+    @Binding var appearance: String
+    @Binding var appLanguage: String
+    @ViewBuilder let updates: () -> Updates
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                SettingsSectionTitle("Language", systemImage: "globe")
-
-                SettingsSurface(isInteractive: true) {
-                    HStack(spacing: 16) {
-                        SettingsIcon(systemImage: "character.bubble")
-
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Application Language")
-                                .font(.headline)
-                            Text("The app content changes immediately. Some system menu items may require reopening the app.")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: EducaSpace.panel) {
+                SettingsGroup("Appearance") {
+                    SettingsRow("Application Theme") {
+                        Picker("Application Theme", selection: $appearance) {
+                            Text("System").tag(AppAppearance.system.rawValue)
+                            Text("Light").tag(AppAppearance.light.rawValue)
+                            Text("Dark").tag(AppAppearance.dark.rawValue)
                         }
-
-                        Spacer(minLength: 16)
-
-                        Picker("Application Language", selection: $appLanguageRawValue) {
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                        .frame(width: 280)
+                        .frame(minHeight: 40)
+                    }
+                    SettingsRowDivider()
+                    SettingsRow("Application Language") {
+                        Picker("Application Language", selection: $appLanguage) {
                             ForEach(AppLanguage.allCases) { language in
-                                Text(language.titleKey)
-                                    .tag(language.rawValue)
+                                Text(language.titleKey).tag(language.rawValue)
                             }
                         }
                         .labelsHidden()
-                        .frame(width: 150)
+                        .frame(width: 180)
+                        .frame(minHeight: 40)
                     }
+                } footer: {
+                    Text("The app content changes immediately. Some system menu items may require reopening the app.")
                 }
 
-                UpdateSettingsSection(updateController: updateController)
+                updates()
 
-                SettingsSectionTitle("Storage", systemImage: "internaldrive")
-
-                SettingsSurface {
-                    VStack(spacing: 0) {
-                        storageRow(
-                            title: "Database",
-                            value: "Application Support",
-                            systemImage: "cylinder"
-                        )
-
-                        Divider()
-                            .padding(.leading, 48)
-
-                        storageRow(
-                            title: "Covers",
-                            value: "Application Support/Kadr/Covers",
-                            systemImage: "photo.on.rectangle"
-                        )
-
-                        Divider()
-                            .padding(.leading, 48)
-
-                        Label(
-                            "All information stays on this Mac. iCloud and online services are not used.",
-                            systemImage: "lock.fill"
-                        )
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 12)
+                SettingsGroup("Storage") {
+                    SettingsRow("Database") {
+                        storagePath("Application Support")
                     }
+                    SettingsRowDivider()
+                    SettingsRow("Covers") {
+                        storagePath("Application Support/Kadr/Covers")
+                    }
+                } footer: {
+                    Label("All information stays on this Mac. iCloud and online services are not used.", systemImage: "lock")
                 }
             }
-            .padding(24)
+            .padding(EducaSpace.panel)
         }
     }
 
-    private func storageRow(
-        title: LocalizedStringKey,
-        value: LocalizedStringKey,
-        systemImage: String
-    ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .foregroundStyle(.secondary)
-                .frame(width: 28)
-
-            Text(title)
-                .font(.headline)
-
-            Spacer(minLength: 16)
-
-            Text(value)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
-                .lineLimit(1)
-                .truncationMode(.middle)
-        }
-        .frame(minHeight: 44)
+    private func storagePath(_ path: LocalizedStringKey) -> some View {
+        Text(path)
+            .foregroundStyle(EducaColor.secondaryText)
+            .textSelection(.enabled)
+            .lineLimit(1)
+            .truncationMode(.middle)
     }
 }
 
-struct SettingsSectionTitle: View {
+/// Quiet grouped preferences instead of elevated dashboard cards.
+struct SettingsGroup<Content: View, Footer: View>: View {
     let title: LocalizedStringKey
-    let systemImage: String
+    @ViewBuilder let content: () -> Content
+    @ViewBuilder let footer: () -> Footer
 
-    init(_ title: LocalizedStringKey, systemImage: String) {
+    init(_ title: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content,
+         @ViewBuilder footer: @escaping () -> Footer) {
         self.title = title
-        self.systemImage = systemImage
+        self.content = content
+        self.footer = footer
+    }
+
+    init(_ title: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content) where Footer == EmptyView {
+        self.init(title, content: content, footer: { EmptyView() })
     }
 
     var body: some View {
-        Label(title, systemImage: systemImage)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: EducaSpace.sm) {
+            Text(title)
+                .font(EducaType.control.weight(.semibold))
+                .padding(.horizontal, EducaSpace.md)
+
+            VStack(spacing: 0, content: content)
+                .background(EducaColor.panel, in: RoundedRectangle(cornerRadius: EducaRadius.button, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: EducaRadius.button, style: .continuous)
+                        .strokeBorder(EducaColor.border)
+                        .allowsHitTesting(false)
+                }
+
+            footer()
+                .font(EducaType.caption)
+                .foregroundStyle(EducaColor.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, EducaSpace.md)
+        }
     }
 }
 
-struct SettingsIcon: View {
-    let systemImage: String
+struct SettingsRow<Content: View>: View {
+    let title: LocalizedStringKey
+    @ViewBuilder let content: () -> Content
+
+    init(_ title: LocalizedStringKey, @ViewBuilder content: @escaping () -> Content) {
+        self.title = title
+        self.content = content
+    }
 
     var body: some View {
-        Image(systemName: systemImage)
-            .font(.title3.weight(.medium))
-            .foregroundStyle(.tint)
-            .frame(width: 36, height: 36)
-            .background(Color.accentColor.opacity(0.12), in: Circle())
-            .accessibilityHidden(true)
+        HStack(alignment: .center, spacing: EducaSpace.lg) {
+            Text(title)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+            Spacer(minLength: 0)
+            content()
+        }
+        .font(EducaType.control)
+        .frame(minHeight: 40)
+        .padding(.horizontal, EducaSpace.lg)
+        .padding(.vertical, EducaSpace.xs)
     }
 }
 
-struct SettingsSurface<Content: View>: View {
-    let isInteractive: Bool
-    let content: Content
-
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var isHovering = false
-
-    init(
-        isInteractive: Bool = false,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.isInteractive = isInteractive
-        self.content = content()
-    }
-
+struct SettingsRowDivider: View {
     var body: some View {
-        content
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                Color(nsColor: .controlBackgroundColor),
-                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-            )
-            .shadow(
-                color: .black.opacity(isHovering ? 0.16 : 0.09),
-                radius: isHovering ? 8 : 4,
-                y: isHovering ? 4 : 2
-            )
-            .scaleEffect(isHovering && !reduceMotion ? 1.01 : 1)
-            .animation(
-                reduceMotion ? nil : .easeOut(duration: 0.16),
-                value: isHovering
-            )
-            .onHover { isHovering = isInteractive && $0 }
+        EducaDivider().padding(.horizontal, EducaSpace.lg)
     }
 }

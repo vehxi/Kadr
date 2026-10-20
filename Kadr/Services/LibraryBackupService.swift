@@ -66,6 +66,7 @@ struct LibraryBackupArchive: Codable {
         let genreIDs: [UUID]
         let seasons: [SeasonRecord]
         let coverData: Data?
+        var countryCodes: [String]? = nil
     }
 
     struct SeasonRecord: Codable {
@@ -103,8 +104,8 @@ enum LibraryBackupError: LocalizedError {
 
 @MainActor
 enum LibraryBackupService {
-    static func makeDocument(context: ModelContext) async throws -> LibraryBackupDocument {
-        let archive = try await makeArchive(context: context)
+    static func makeDocument(context: ModelContext, coverStore: CoverStore = .shared) async throws -> LibraryBackupDocument {
+        let archive = try await makeArchive(context: context, coverStore: coverStore)
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         return try LibraryBackupDocument(data: encoder.encode(archive))
@@ -121,14 +122,14 @@ enum LibraryBackupService {
         return archive
     }
 
-    static func restore(_ archive: LibraryBackupArchive, context: ModelContext) async throws {
+    static func restore(_ archive: LibraryBackupArchive, context: ModelContext, coverStore: CoverStore = .shared) async throws {
         try validate(archive)
 
         var restoredCoverFilenames: [UUID: String] = [:]
         do {
             for movie in archive.movies {
                 guard let coverData = movie.coverData else { continue }
-                restoredCoverFilenames[movie.id] = try await CoverStore.shared.write(coverData)
+                restoredCoverFilenames[movie.id] = try await coverStore.write(coverData)
             }
 
             try context.transaction {
@@ -161,7 +162,8 @@ enum LibraryBackupService {
                         tier: record.tierRawValue.flatMap(MovieTier.init(rawValue:)),
                         createdAt: record.createdAt,
                         updatedAt: record.updatedAt,
-                        genres: record.genreIDs.compactMap { genresByID[$0] }
+                        genres: record.genreIDs.compactMap { genresByID[$0] },
+                        countryCodes: record.countryCodes ?? []
                     )
                     movie.seasons = record.seasons.map { seasonRecord in
                         let season = SeriesSeason(
@@ -187,13 +189,13 @@ enum LibraryBackupService {
         } catch {
             context.rollback()
             for filename in restoredCoverFilenames.values {
-                try? await CoverStore.shared.delete(filename: filename)
+                try? await coverStore.delete(filename: filename)
             }
             throw error
         }
 
         let referencedFilenames = Set(restoredCoverFilenames.values)
-        try? await CoverStore.shared.removeOrphans(referencedFilenames: referencedFilenames)
+        try? await coverStore.removeOrphans(referencedFilenames: referencedFilenames)
     }
 
     static func reset(
@@ -208,7 +210,7 @@ enum LibraryBackupService {
         try InitialGenreSeeder.seedIfNeeded(context: context, language: language)
     }
 
-    private static func makeArchive(context: ModelContext) async throws -> LibraryBackupArchive {
+    private static func makeArchive(context: ModelContext, coverStore: CoverStore) async throws -> LibraryBackupArchive {
         let genres = try context.fetch(FetchDescriptor<Genre>())
             .sorted { $0.id.uuidString < $1.id.uuidString }
         let movies = try context.fetch(FetchDescriptor<Movie>())
@@ -218,7 +220,7 @@ enum LibraryBackupService {
         movieRecords.reserveCapacity(movies.count)
 
         for movie in movies {
-            let coverData = try await CoverStore.shared.data(for: movie.coverFilename)
+            let coverData = try await coverStore.data(for: movie.coverFilename)
             movieRecords.append(
                 LibraryBackupArchive.MovieRecord(
                     id: movie.id,
@@ -249,7 +251,8 @@ enum LibraryBackupService {
                             }
                         )
                     },
-                    coverData: coverData
+                    coverData: coverData,
+                    countryCodes: movie.countryCodes
                 )
             )
         }
@@ -294,6 +297,10 @@ enum LibraryBackupService {
         var episodeIDs = Set<UUID>()
 
         for movie in archive.movies {
+            if let codes = movie.countryCodes,
+               (Set(codes).count != codes.count || codes.contains(where: { !ProductionCountries.codes.contains($0) })) {
+                throw LibraryBackupError.invalidValues
+            }
             guard MediaKind(rawValue: movie.mediaKindRawValue) != nil,
                   ViewingStatus(rawValue: movie.statusRawValue) != nil,
                   RatingRules.validated(movie.rating) == movie.rating,

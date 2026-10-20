@@ -43,9 +43,9 @@ struct MovieCardView: View {
                     }
 
                 Text(movie.title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .font(EducaType.heading)
+                    .foregroundStyle(EducaColor.text)
+                    .lineLimit(2, reservesSpace: true)
                     .truncationMode(.tail)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -63,22 +63,21 @@ struct MovieCardView: View {
                     if movie.rating != nil {
                         Label("\(movie.rating ?? 0)", systemImage: "star.fill")
                             .labelStyle(.titleAndIcon)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                     }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(EducaType.caption)
+                .foregroundStyle(EducaColor.secondaryText)
                 .monospacedDigit()
                 .frame(height: 16)
             }
             .contentShape(Rectangle())
-            .scaleEffect(isHovering && !reduceMotion ? 1.015 : 1)
             .animation(
-                reduceMotion ? nil : .easeOut(duration: 0.16),
+                reduceMotion ? nil : EducaMotion.feedback,
                 value: isHovering
             )
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(EducaPosterButtonStyle())
         .onHover { isHovering = $0 }
         .accessibilityLabel(accessibilityDescription)
     }

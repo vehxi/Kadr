@@ -7,8 +7,6 @@ struct GenreManagementRow: View {
     let onDelete: () -> Void
 
     @State private var name: String
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var isHovering = false
 
     init(
         genre: Genre,
@@ -25,19 +23,19 @@ struct GenreManagementRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "tag.fill")
-                .foregroundStyle(.tint)
-                .frame(width: 28, height: 28)
-                .background(Color.accentColor.opacity(0.12), in: Circle())
+            Image(systemName: "tag")
+                .foregroundStyle(EducaColor.secondaryText)
+                .frame(width: 20)
                 .accessibilityHidden(true)
 
             TextField("Genre Name", text: $name)
+                .textFieldStyle(EducaTextFieldStyle())
                 .onSubmit {
                     onRename(name)
                 }
 
             Text(genre.movies.count, format: .number)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(EducaColor.secondaryText)
                 .monospacedDigit()
                 .frame(minWidth: 28, alignment: .trailing)
                 .help("Number of Movies")
@@ -46,37 +44,27 @@ struct GenreManagementRow: View {
                 onRename(name)
             } label: {
                 Image(systemName: "checkmark")
+                    .frame(width: 40, height: 40)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(EducaButtonStyle(kind: .icon))
             .disabled(
                 TextNormalizer.displayName(name).isEmpty
                     || TextNormalizer.displayName(name) == displayName
             )
             .accessibilityLabel("Save Genre Name")
+            .help("Save Genre Name")
 
             Button(role: .destructive, action: onDelete) {
                 Image(systemName: "trash")
+                    .foregroundStyle(.red)
+                    .frame(width: 40, height: 40)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(EducaButtonStyle(kind: .icon))
             .accessibilityLabel("Delete Genre")
+            .help("Delete Genre")
         }
-        .padding(.horizontal, 14)
-        .frame(minHeight: 52)
-        .background(
-            Color(nsColor: .controlBackgroundColor),
-            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-        )
-        .shadow(
-            color: .black.opacity(isHovering ? 0.14 : 0.07),
-            radius: isHovering ? 7 : 3,
-            y: isHovering ? 4 : 2
-        )
-        .scaleEffect(isHovering && !reduceMotion ? 1.01 : 1)
-        .animation(
-            reduceMotion ? nil : .easeOut(duration: 0.16),
-            value: isHovering
-        )
-        .onHover { isHovering = $0 }
+        .padding(.horizontal, EducaSpace.md)
+        .padding(.vertical, EducaSpace.sm)
         .onChange(of: displayName) { _, newValue in
             name = newValue
         }

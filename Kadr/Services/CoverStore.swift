@@ -7,6 +7,12 @@ actor CoverStore {
     private let fileManager: FileManager
     private let directoryURL: URL
 
+    // Isolated stores for tests; does not inspect or migrate the user's cover folder.
+    init(directoryURL: URL, fileManager: FileManager = .default) {
+        self.directoryURL = directoryURL
+        self.fileManager = fileManager
+    }
+
     init(fileManager: FileManager = .default) {
         self.fileManager = fileManager
         let applicationSupport = fileManager.urls(

@@ -1,0 +1,14 @@
+World map geometry: Natural Earth, Admin 0 – Countries, 1:110 million.
+Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_admin_0_countries.geojson
+Downloaded: 2026-10-20.
+Terms: https://www.naturalearthdata.com/about/terms-of-use/
+Natural Earth publishes these map data in the public domain.
+
+world-countries.json is a derived display asset, not a country metadata catalog.
+It contains flattened polygon rings, including holes, with normalized coordinates:
+x = (longitude + 180) / 360; y = (85 - latitude) / 145.
+Antarctica is omitted. Coordinates are rounded to six decimal places.
+Country identifiers use ISO_A2_EH, falling back to ADM0_A3 for map units without one.
+Names use NAME_EN, falling back to ADMIN; displayed names use Foundation Locale.
+Borders and map units follow the source dataset. At this scale, some small
+countries and islands are not represented. No film data is included in this asset.

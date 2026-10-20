@@ -4,6 +4,21 @@
     "" : {
 
     },
+    "System" : {
+      "localizations" : {
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Системная" } }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Светлая" } }
+      }
+    },
+    "Dark" : {
+      "localizations" : {
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Тёмная" } }
+      }
+    },
     "%@ Tier" : {
       "localizations" : {
         "ru" : {
@@ -38,7 +53,6 @@
       }
     },
     "%lld movies" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -98,6 +112,16 @@
         }
       }
     },
+    "%lld watched titles without countries" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без стран производства: %lld"
+          }
+        }
+      }
+    },
     "%lld/%lld" : {
       "localizations" : {
         "en" : {
@@ -111,7 +135,17 @@
     "•" : {
 
     },
+    "0" : {
+
+    },
+    "1" : {
+
+    },
+    "1 ★" : {
+
+    },
     "A genre with this name already exists." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -138,6 +172,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Запись с таким названием и годом уже существует."
+          }
+        }
+      }
+    },
+    "A World of Cinema" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кино без границ"
           }
         }
       }
@@ -215,7 +259,14 @@
       }
     },
     "Add notes or a synopsis" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте заметки или описание"
+          }
+        }
+      }
     },
     "Add Title" : {
       "localizations" : {
@@ -310,12 +361,12 @@
         }
       }
     },
-    "Automatically check for updates" : {
+    "Appearance" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Автоматически проверять обновления"
+            "value" : "Внешний вид"
           }
         }
       }
@@ -346,6 +397,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Application Support/Kadr/Covers"
+          }
+        }
+      }
+    },
+    "Application Theme" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема приложения"
+          }
+        }
+      }
+    },
+    "Automatically check for updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проверять обновления"
+          }
+        }
+      }
+    },
+    "Average rating" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Средняя оценка"
           }
         }
       }
@@ -381,6 +462,36 @@
         }
       }
     },
+    "Check for Updates…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверить обновления…"
+          }
+        }
+      }
+    },
+    "Checking…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка…"
+          }
+        }
+      }
+    },
+    "Choose Countries…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать страны…"
+          }
+        }
+      }
+    },
     "Choose Cover" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -403,6 +514,7 @@
       }
     },
     "Choose…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -429,26 +541,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрыть"
-          }
-        }
-      }
-    },
-    "Check for Updates…" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проверить обновления…"
-          }
-        }
-      }
-    },
-    "Checking…" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проверка…"
           }
         }
       }
@@ -504,7 +596,28 @@
         }
       }
     },
+    "Countries explored" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Страны на карте"
+          }
+        }
+      }
+    },
+    "Country" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Страна"
+          }
+        }
+      }
+    },
     "Cover" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -530,6 +643,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обложки"
+          }
+        }
+      }
+    },
+    "Dark Theme" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тёмная"
           }
         }
       }
@@ -596,6 +719,17 @@
         }
       }
     },
+    "Demo" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Демо"
+          }
+        }
+      }
+    },
     "Description" : {
       "localizations" : {
         "ru" : {
@@ -626,6 +760,16 @@
         }
       }
     },
+    "Drag to move · Pinch to zoom" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетаскивание — сдвиг · Жест щипка — масштаб"
+          }
+        }
+      }
+    },
     "Drag to move this movie to another tier." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -648,6 +792,7 @@
       }
     },
     "Drop an image file here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -688,6 +833,16 @@
         }
       }
     },
+    "Edit Genres…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить жанры…"
+          }
+        }
+      }
+    },
     "Edit Movie" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -706,16 +861,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Редактировать"
-          }
-        }
-      }
-    },
-    "Edit Genres…" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Изменить жанры…"
           }
         }
       }
@@ -760,12 +905,32 @@
         }
       }
     },
+    "Explore the countries behind the films." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Откройте страны через их кино."
+          }
+        }
+      }
+    },
     "Favorite" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Любимое"
+          }
+        }
+      }
+    },
+    "Follow your Mac or choose a light or dark appearance." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как на Mac или своя светлая либо тёмная тема."
           }
         }
       }
@@ -810,16 +975,6 @@
         }
       }
     },
-    "Keep Editing" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вернуться к редактированию"
-          }
-        }
-      }
-    },
     "Kadr %@" : {
       "localizations" : {
         "ru" : {
@@ -830,12 +985,72 @@
         }
       }
     },
+    "Keep Editing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вернуться к редактированию"
+          }
+        }
+      }
+    },
     "Language" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Язык"
+          }
+        }
+      }
+    },
+    "Light Theme" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Светлая"
+          }
+        }
+      }
+    },
+    "Loading Map…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка карты…"
+          }
+        }
+      }
+    },
+    "Make It Yours" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Под себя"
+          }
+        }
+      }
+    },
+    "Map Mode" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режим карты"
+          }
+        }
+      }
+    },
+    "Map Unavailable" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карта недоступна"
           }
         }
       }
@@ -955,12 +1170,32 @@
         }
       }
     },
+    "No Countries Found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Страны не найдены"
+          }
+        }
+      }
+    },
     "No cover. %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обложка отсутствует. %@"
+          }
+        }
+      }
+    },
+    "No data" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет данных"
           }
         }
       }
@@ -1006,12 +1241,43 @@
         }
       }
     },
+    "No production countries selected." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Страны производства не выбраны."
+          }
+        }
+      }
+    },
+    "No sample films here yet." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для этой страны пока нет фильмов в примере."
+          }
+        }
+      }
+    },
     "No Titles Here" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Здесь пока ничего нет"
+          }
+        }
+      }
+    },
+    "No watched titles from this country yet." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока нет просмотренных фильмов или сериалов из этой страны."
           }
         }
       }
@@ -1057,12 +1323,22 @@
         }
       }
     },
-    "Opens an image picker. You can also drop or paste an image." : {
+    "Only watched titles contribute to the map. Coproductions count in each country." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открывает выбор изображения. Также можно перетащить или вставить изображение."
+            "value" : "Карта учитывает только просмотренное. Совместное производство засчитывается каждой стране."
+          }
+        }
+      }
+    },
+    "Open a title and edit its production countries to add it to the map." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открой карточку и укажи страны производства в редакторе, чтобы добавить запись на карту."
           }
         }
       }
@@ -1073,6 +1349,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открывает список жанров с поиском."
+          }
+        }
+      }
+    },
+    "Opens an image picker. You can also drop or paste an image." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывает выбор изображения. Также можно перетащить или вставить изображение."
           }
         }
       }
@@ -1093,6 +1379,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Возможный дубликат"
+          }
+        }
+      }
+    },
+    "Production Countries" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Страны производства"
           }
         }
       }
@@ -1214,12 +1510,44 @@
         }
       }
     },
+    "Reset Map" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать весь мир"
+          }
+        }
+      }
+    },
     "Russian" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Русский"
+          }
+        }
+      }
+    },
+    "Sample data only. Your library has not been changed." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь показаны данные для примера. Ваша медиатека не изменена."
+          }
+        }
+      }
+    },
+    "Sample films" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильмы из примера"
           }
         }
       }
@@ -1244,22 +1572,42 @@
         }
       }
     },
-    "Search Genres" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поиск жанров"
-          }
-        }
-      }
-    },
     "Save Genre Name" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить название жанра"
+          }
+        }
+      }
+    },
+    "Saving…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение…"
+          }
+        }
+      }
+    },
+    "Search Countries" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск стран"
+          }
+        }
+      }
+    },
+    "Search Genres" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск жанров"
           }
         }
       }
@@ -1340,6 +1688,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Как в системе"
+          }
+        }
+      }
+    },
+    "System Theme" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системная"
           }
         }
       }
@@ -1425,6 +1783,36 @@
         }
       }
     },
+    "The world map could not be loaded." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить карту мира."
+          }
+        }
+      }
+    },
+    "This backup was created by an unsupported version of Kadr." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта резервная копия создана неподдерживаемой версией Kadr."
+          }
+        }
+      }
+    },
+    "This country's outline is not available at this map scale." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На этом масштабе контур страны недоступен. Статистика учтена."
+          }
+        }
+      }
+    },
     "This genre will be permanently deleted." : {
       "localizations" : {
         "ru" : {
@@ -1441,16 +1829,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Этот жанр будет удалён из %lld фильмов. Сами фильмы удалены не будут."
-          }
-        }
-      }
-    },
-    "This backup was created by an unsupported version of Kadr." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Эта резервная копия создана неподдерживаемой версией Kadr."
           }
         }
       }
@@ -1505,22 +1883,32 @@
         }
       }
     },
-    "Try another search." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробуйте изменить запрос."
-          }
-        }
-      }
-    },
     "Toggle Sidebar" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать или скрыть боковую панель"
+          }
+        }
+      }
+    },
+    "Try Again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить"
+          }
+        }
+      }
+    },
+    "Try another search." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте изменить запрос."
           }
         }
       }
@@ -1546,6 +1934,7 @@
       }
     },
     "Untitled Movie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1556,6 +1945,7 @@
       }
     },
     "Untitled Series" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1595,6 +1985,16 @@
         }
       }
     },
+    "Viewing Map" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карта просмотров"
+          }
+        }
+      }
+    },
     "Want to Watch" : {
       "localizations" : {
         "ru" : {
@@ -1615,6 +2015,27 @@
         }
       }
     },
+    "Watched films" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Просмотренные фильмы"
+          }
+        }
+      }
+    },
+    "Watched titles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Просмотрено"
+          }
+        }
+      }
+    },
     "Watching" : {
       "localizations" : {
         "ru" : {
@@ -1625,12 +2046,42 @@
         }
       }
     },
+    "World viewing map" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карта мира с географией просмотров"
+          }
+        }
+      }
+    },
     "Your Library Is Empty" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваша фильмотека пуста"
+          }
+        }
+      }
+    },
+    "Zoom In" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приблизить"
+          }
+        }
+      }
+    },
+    "Zoom Out" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отдалить"
           }
         }
       }

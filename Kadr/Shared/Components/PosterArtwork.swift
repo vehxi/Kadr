@@ -7,18 +7,17 @@ struct PosterArtwork: View {
     var mediaKind: MediaKind = .movie
     var cornerRadius: CGFloat = 10
 
+    @Environment(\.locale) private var locale
     @State private var image: NSImage?
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.quaternary)
+                    .fill(EducaColor.raised)
 
                 if let image {
-                    Image(nsImage: image)
-                        .resizable()
-                        .scaledToFill()
+                    FillingPosterImage(image: image)
                         .frame(
                             width: geometry.size.width,
                             height: geometry.size.height
@@ -26,14 +25,14 @@ struct PosterArtwork: View {
                         .clipped()
                         .accessibilityLabel(Text("Cover for \(title)"))
                 } else {
-                    placeholder
+                    placeholder(compact: geometry.size.width < 140)
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(.primary.opacity(0.08))
+                    .strokeBorder(EducaColor.border)
             }
         }
         .task(id: filename) {
@@ -41,17 +40,19 @@ struct PosterArtwork: View {
         }
     }
 
-    private var placeholder: some View {
+    private func placeholder(compact: Bool) -> some View {
         VStack(spacing: 12) {
             Image(systemName: mediaKind.systemImage)
-                .font(.system(size: 32, weight: .light))
-                .foregroundStyle(.tertiary)
-            Text(title.isEmpty ? untitledLabel : title)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .lineLimit(3)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 14)
+                .font(.system(size: compact ? 24 : 32, weight: .light))
+                .foregroundStyle(EducaColor.mutedText)
+            if !compact {
+                Text(title.isEmpty ? untitledLabel : title)
+                    .font(EducaType.heading)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .foregroundStyle(EducaColor.secondaryText)
+                    .padding(.horizontal, EducaSpace.lg)
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("No cover. \(title)"))
@@ -59,8 +60,8 @@ struct PosterArtwork: View {
 
     private var untitledLabel: String {
         switch mediaKind {
-        case .movie: String(localized: "Untitled Movie")
-        case .series: String(localized: "Untitled Series")
+        case .movie: AppLocalization.string("Untitled Movie", locale: locale)
+        case .series: AppLocalization.string("Untitled Series", locale: locale)
         }
     }
 
@@ -73,5 +74,20 @@ struct PosterArtwork: View {
             return
         }
         image = NSImage(contentsOf: url)
+    }
+}
+
+/// Fill the frame proportionally, cropping excess edges around the image's center.
+struct FillingPosterImage: View {
+    let image: NSImage
+
+    var body: some View {
+        GeometryReader { geometry in
+            Image(nsImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+        }
     }
 }

@@ -27,7 +27,9 @@ let package = Package(
                 "Resources/Assets.xcassets"
             ],
             resources: [
-                .process("Resources/Localizable.xcstrings")
+                .process("Resources/Localizable.xcstrings"),
+                .process("Resources/world-countries.json"),
+                .process("Resources/world-map-source.txt")
             ]
         ),
         .testTarget(

@@ -19,6 +19,8 @@ final class Movie {
     var tierRawValue: String?
     var createdAt: Date
     var updatedAt: Date
+    // Optional additive storage allows existing libraries to migrate without invented countries.
+    var productionCountryCodes: [String]? = nil
 
     @Relationship(deleteRule: .nullify, inverse: \Genre.movies)
     var genres: [Genre]
@@ -41,7 +43,8 @@ final class Movie {
         createdAt: Date = .now,
         updatedAt: Date = .now,
         genres: [Genre] = [],
-        seasons: [SeriesSeason] = []
+        seasons: [SeriesSeason] = [],
+        countryCodes: [String] = []
     ) {
         self.id = id
         self.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -63,6 +66,12 @@ final class Movie {
         self.updatedAt = updatedAt
         self.genres = genres
         self.seasons = seasons
+        self.countryCodes = countryCodes
+    }
+
+    var countryCodes: [String] {
+        get { ProductionCountries.normalized(productionCountryCodes ?? []) }
+        set { productionCountryCodes = ProductionCountries.normalized(newValue) }
     }
 
     var mediaKind: MediaKind {
@@ -147,6 +156,7 @@ final class Movie {
         synopsis: String,
         coverFilename: String?,
         genres: [Genre],
+        countryCodes: [String]? = nil,
         now: Date = .now
     ) {
         self.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -164,6 +174,7 @@ final class Movie {
         self.synopsis = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
         self.coverFilename = coverFilename
         self.genres = genres
+        if let countryCodes { self.countryCodes = countryCodes }
         updatedAt = now
     }
 

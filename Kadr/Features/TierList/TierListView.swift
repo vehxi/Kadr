@@ -28,7 +28,7 @@ struct TierListView: View {
 
                         unrankedLane
                     }
-                    .padding(24)
+                    .padding(EducaSpace.page)
                 }
             }
         }
@@ -43,16 +43,16 @@ struct TierListView: View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Build Your Ranking")
-                    .font(.title2.weight(.semibold))
+                    .educaScreenTitle()
                 Text("Drag every poster into the tier where it belongs.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
             }
 
             Spacer()
 
             Text("\(movies.count) titles")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(EducaColor.secondaryText)
                 .monospacedDigit()
         }
         .padding(.bottom, 8)
@@ -148,25 +148,28 @@ private struct TierLane: View {
         HStack(spacing: 0) {
             VStack(spacing: 6) {
                 Text(title)
-                    .font(.system(size: 34, weight: .black, design: .rounded))
-                    .foregroundStyle(title == "—" ? AnyShapeStyle(.secondary) : AnyShapeStyle(.white))
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(EducaColor.text)
 
                 Text(subtitle)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(title == "—" ? AnyShapeStyle(.secondary) : AnyShapeStyle(.white.opacity(0.82)))
+                    .foregroundStyle(EducaColor.secondaryText)
                     .monospacedDigit()
                     .lineLimit(1)
             }
             .frame(width: 88)
             .frame(maxHeight: .infinity)
-            .background(color.opacity(title == "—" ? 0.10 : 0.84))
+            .background(EducaColor.secondaryButton)
+            .overlay(alignment: .leading) {
+                Rectangle().fill(color.opacity(0.6)).frame(width: 3)
+            }
 
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 14) {
                     if movies.isEmpty {
                         Label("Drop titles here", systemImage: "arrow.down.to.line")
                             .font(.subheadline)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(EducaColor.secondaryText)
                             .frame(minWidth: 160, minHeight: 176)
                     } else {
                         ForEach(movies) { movie in
@@ -183,9 +186,12 @@ private struct TierLane: View {
             .scrollIndicators(.hidden)
         }
         .frame(minHeight: 196)
-        .background(isDropTarget ? color.opacity(0.13) : Color.primary.opacity(0.035))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.08), radius: 3, y: 1)
+        .clipShape(RoundedRectangle(cornerRadius: EducaRadius.panel, style: .continuous))
+        .educaPanel(padding: 0)
+        .overlay {
+            RoundedRectangle(cornerRadius: EducaRadius.panel, style: .continuous)
+                .strokeBorder(EducaColor.text.opacity(isDropTarget ? 0.5 : 0), lineWidth: 2)
+        }
         .dropDestination(for: String.self) { items, _ in
             guard let movieID = items.first else { return false }
             return onDrop(movieID)

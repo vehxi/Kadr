@@ -12,22 +12,26 @@ struct GenreSettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                SettingsSectionTitle("Genres", systemImage: "tag")
+            VStack(alignment: .leading, spacing: EducaSpace.panel) {
+                VStack(alignment: .leading, spacing: EducaSpace.sm) {
+                    Text("Genres")
+                        .font(EducaType.title)
+                        .tracking(-0.25)
+                    Text("Add a genre to use it in movie forms.")
+                        .font(EducaType.control)
+                        .foregroundStyle(EducaColor.secondaryText)
+                }
 
-                SettingsSurface(isInteractive: true) {
-                    HStack(spacing: 12) {
-                        SettingsIcon(systemImage: "plus")
-
+                HStack(spacing: EducaSpace.sm) {
                         TextField("New Genre", text: $newGenreName)
-                            .textFieldStyle(.roundedBorder)
+                            .textFieldStyle(EducaTextFieldStyle())
                             .onSubmit(addGenre)
 
-                        Button("Add", action: addGenre)
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.large)
-                            .disabled(TextNormalizer.displayName(newGenreName).isEmpty)
-                    }
+                        Button(action: addGenre) {
+                            Label("Add", systemImage: "plus")
+                        }
+                        .buttonStyle(EducaButtonStyle(kind: .primary))
+                        .disabled(TextNormalizer.displayName(newGenreName).isEmpty)
                 }
 
                 if genres.isEmpty {
@@ -38,8 +42,12 @@ struct GenreSettingsView: View {
                     )
                     .frame(maxWidth: .infinity, minHeight: 260)
                 } else {
-                    LazyVStack(spacing: 10) {
-                        ForEach(sortedGenres) { genre in
+                    let orderedGenres = sortedGenres
+                    SettingsGroup("Genres") {
+                        ForEach(orderedGenres) { genre in
+                            if genre.id != orderedGenres.first?.id {
+                                SettingsRowDivider()
+                            }
                             GenreManagementRow(
                                 genre: genre,
                                 displayName: genre.localizedName(locale: locale),
@@ -50,7 +58,7 @@ struct GenreSettingsView: View {
                     }
                 }
             }
-            .padding(24)
+            .padding(EducaSpace.panel)
         }
         .alert(
             "Delete Genre?",
@@ -91,7 +99,7 @@ struct GenreSettingsView: View {
         let displayName = TextNormalizer.displayName(newGenreName)
         guard !displayName.isEmpty else { return }
         guard !GenreRules.isDuplicate(name: displayName, among: genrePairs) else {
-            message = String(localized: "A genre with this name already exists.")
+            message = AppLocalization.string("A genre with this name already exists.", locale: locale)
             return
         }
 
@@ -113,7 +121,7 @@ struct GenreSettingsView: View {
             excluding: genre.id,
             among: genrePairs
         ) else {
-            message = String(localized: "A genre with this name already exists.")
+            message = AppLocalization.string("A genre with this name already exists.", locale: locale)
             return
         }
 

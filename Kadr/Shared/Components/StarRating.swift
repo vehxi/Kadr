@@ -20,24 +20,26 @@ struct StarRating: View {
                 } label: {
                     ZStack {
                         Image(systemName: "star")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                             .opacity(isFilled ? 0 : 1)
 
                         Image(systemName: "star.fill")
-                            .foregroundStyle(.yellow)
+                            .foregroundStyle(EducaColor.text)
                             .opacity(isFilled ? 1 : 0)
 
                         Image(systemName: "star")
-                            .foregroundStyle(.primary.opacity(0.70))
+                            .foregroundStyle(EducaColor.text)
                             .opacity(isFilled ? 1 : 0)
                     }
-                        .scaleEffect(isHovered ? 1.12 : 1)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Rectangle())
+                        .scaleEffect(isHovered && !reduceMotion ? 1.08 : 1)
                         .animation(
-                            reduceMotion ? nil : .easeOut(duration: 0.16),
+                            reduceMotion ? nil : EducaMotion.feedback,
                             value: hoveredRating
                         )
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(EducaPosterButtonStyle())
                 .frame(width: 40, height: 40)
                 .contentShape(Rectangle())
                 .disabled(!isEnabled)
@@ -57,9 +59,11 @@ struct StarRating: View {
                     rating = nil
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(EducaColor.secondaryText)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(EducaPosterButtonStyle())
                 .frame(width: 40, height: 40)
                 .contentShape(Rectangle())
                 .disabled(!isEnabled)

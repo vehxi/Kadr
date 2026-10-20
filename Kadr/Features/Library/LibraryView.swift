@@ -4,48 +4,96 @@ import SwiftUI
 struct LibraryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.locale) private var locale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AppStorage("appLanguage") private var appLanguageRawValue = AppLanguage.system.rawValue
     @Query(sort: \Movie.updatedAt, order: .reverse) private var movies: [Movie]
 
     @State private var selection: LibraryFilter? = .all
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var sidebarToggle = SidebarToggleAction()
     @State private var selectedMovie: Movie?
     @State private var showsAddEditor = false
     @State private var startupError: String?
 
     private let grid = [
-        GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 28, alignment: .top)
+        GridItem(.adaptive(minimum: 180, maximum: 240), spacing: 24, alignment: .top)
     ]
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             sidebar
-                .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 280)
+                .frame(minWidth: 220, idealWidth: 220, maxWidth: 280)
+                .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 280)
+                .toolbar(removing: .sidebarToggle)
         } detail: {
-            content
+            VStack(alignment: .leading, spacing: 0) {
+                if selection != .geography && selection != .tierList {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(selectionTitle).educaScreenTitle()
+                        Spacer(minLength: 16)
+                        Text("\(filteredMovies.count) titles")
+                            .font(EducaType.caption)
+                            .foregroundStyle(EducaColor.secondaryText)
+                            .monospacedDigit()
+                    }
+                    .padding(.horizontal, EducaSpace.page)
+                    .padding(.top, EducaSpace.panel)
+                    .padding(.bottom, EducaSpace.sm)
+                }
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+                .toolbar(removing: .sidebarToggle)
+                .background { EducaCanvas() }
                 .navigationTitle(selectionTitle)
                 .background(WindowTitleUpdater(title: selectionTitle))
+                .background(SidebarToggleAnchor(action: sidebarToggle))
                 .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
+                    ToolbarItem(placement: .navigation) {
                         Button {
-                            presentAddMovie()
+                            if reduceMotion || !sidebarToggle.toggle() {
+                                columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
+                            }
                         } label: {
-                            Label("Add Title", systemImage: "plus")
+                            Image(systemName: "sidebar.left")
+                                .frame(width: 40, height: 40)
                         }
-                        .keyboardShortcut("n", modifiers: .command)
-                        .help("Add Title")
+                        .buttonStyle(EducaButtonStyle(kind: .icon))
+                        .help("Toggle Sidebar")
+                        .accessibilityLabel("Toggle Sidebar")
                     }
+                    .sharedBackgroundVisibility(.hidden)
+
+                    ToolbarItem(placement: .primaryAction) {
+                        if selection != .geography {
+                            Button {
+                                presentAddMovie()
+                            } label: {
+                                Label("Add Title", systemImage: "plus")
+                            }
+                            .buttonStyle(EducaButtonStyle(kind: .primary))
+                            .keyboardShortcut("n", modifiers: .command)
+                            .help("Add Title")
+                        }
+                    }
+                    .sharedBackgroundVisibility(.hidden)
                 }
         }
         .navigationSplitViewStyle(.balanced)
+        .toolbar(removing: .sidebarToggle)
+        .toolbarBackground(.hidden, for: .windowToolbar)
         .sheet(item: $selectedMovie) { movie in
             MovieDetailView(movie: movie) {
                 selectedMovie = nil
             }
             .environment(\.locale, locale)
+            .educaRoot()
         }
         .sheet(isPresented: $showsAddEditor) {
             MovieEditorView()
                 .environment(\.locale, locale)
+                .educaRoot()
         }
         .onReceive(NotificationCenter.default.publisher(for: .newMovieRequested)) { _ in
             presentAddMovie()
@@ -105,6 +153,9 @@ struct LibraryView: View {
                 Label("Tier List", systemImage: "square.grid.3x3.square")
                     .tag(LibraryFilter.tierList)
 
+                Label("Viewing Map", systemImage: "globe.europe.africa")
+                    .tag(LibraryFilter.geography)
+
                 Section("Status") {
                     ForEach(ViewingStatus.allCases) { status in
                         Label {
@@ -112,7 +163,7 @@ struct LibraryView: View {
                                 Text(status.titleKey)
                                 Spacer()
                                 Text(statusCount(status), format: .number)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(EducaColor.secondaryText)
                                     .monospacedDigit()
                             }
                         } icon: {
@@ -123,18 +174,26 @@ struct LibraryView: View {
                 }
             }
             .listStyle(.sidebar)
+            .scrollContentBackground(.hidden)
+            .font(EducaType.control)
+            .symbolRenderingMode(.monochrome)
 
-            Divider()
+            EducaDivider()
 
             SidebarSettingsLink()
                 .padding(8)
+        }
+        .background {
+            EducaSidebarSurface(reduceTransparency: reduceTransparency).ignoresSafeArea(.container)
         }
         .navigationTitle("My Library")
     }
 
     @ViewBuilder
     private var content: some View {
-        if selection == .tierList {
+        if selection == .geography {
+            GeographyView(openMovie: { selectedMovie = $0 })
+        } else if selection == .tierList {
             TierListView(movies: movies) { movie in
                 showDetails(for: movie)
             }
@@ -147,7 +206,7 @@ struct LibraryView: View {
                 Button("Add Title") {
                     presentAddMovie()
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(EducaButtonStyle(kind: .primary))
             }
         } else {
             ScrollView {
@@ -158,7 +217,7 @@ struct LibraryView: View {
                         }
                     }
                 }
-                .padding(24)
+                .padding(EducaSpace.page)
             }
         }
     }
@@ -169,7 +228,7 @@ struct LibraryView: View {
             return movies
         case .movies:
             return movies.filter { $0.mediaKind == .movie }
-        case .tierList:
+        case .tierList, .geography:
             return movies
         case .series:
             return movies.filter { $0.mediaKind == .series }
@@ -192,6 +251,8 @@ struct LibraryView: View {
             AppLocalization.string("Favorite", locale: locale)
         case .tierList:
             AppLocalization.string("Tier List", locale: locale)
+        case .geography:
+            AppLocalization.string("Viewing Map", locale: locale)
         case .status(let status):
             status.localizedTitle(locale: locale)
         }
@@ -239,7 +300,7 @@ struct LibraryView: View {
             Text(title)
             Spacer()
             Text(count, format: .number)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(EducaColor.secondaryText)
                 .monospacedDigit()
         }
     }
@@ -254,32 +315,13 @@ struct LibraryView: View {
 }
 
 private struct SidebarSettingsLink: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var isHovering = false
-
     var body: some View {
         SettingsLink {
             Label("Settings", systemImage: "gearshape")
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 10)
-                .frame(height: 36)
+                .frame(height: 40)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .background(
-            Color.primary.opacity(isHovering ? 0.09 : 0.045),
-            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-        )
-        .shadow(
-            color: .black.opacity(isHovering ? 0.13 : 0.06),
-            radius: isHovering ? 5 : 2,
-            y: isHovering ? 3 : 1
-        )
-        .scaleEffect(isHovering && !reduceMotion ? 1.015 : 1)
-        .animation(
-            reduceMotion ? nil : .easeOut(duration: 0.16),
-            value: isHovering
-        )
-        .onHover { isHovering = $0 }
+        .buttonStyle(EducaButtonStyle())
     }
 }

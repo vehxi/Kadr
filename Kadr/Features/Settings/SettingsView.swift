@@ -15,6 +15,6 @@ struct SettingsView: View {
                     Label("Genres", systemImage: "tag")
                 }
         }
-        .frame(width: 640, height: 520)
+        .frame(minWidth: 680, idealWidth: 680, minHeight: 560, idealHeight: 600)
     }
 }

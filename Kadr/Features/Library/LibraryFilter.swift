@@ -6,6 +6,7 @@ enum LibraryFilter: Hashable, Identifiable {
     case series
     case favorites
     case tierList
+    case geography
     case status(ViewingStatus)
 
     var id: String {
@@ -15,6 +16,7 @@ enum LibraryFilter: Hashable, Identifiable {
         case .series: "series"
         case .favorites: "favorites"
         case .tierList: "tier-list"
+        case .geography: "geography"
         case .status(let status): status.rawValue
         }
     }
@@ -26,6 +28,7 @@ enum LibraryFilter: Hashable, Identifiable {
         case .series: "Series"
         case .favorites: "Favorite"
         case .tierList: "Tier List"
+        case .geography: "Viewing Map"
         case .status(let status): status.titleKey
         }
     }
@@ -37,6 +40,7 @@ enum LibraryFilter: Hashable, Identifiable {
         case .series: "play.rectangle.on.rectangle"
         case .favorites: "heart.fill"
         case .tierList: "square.grid.3x3.square"
+        case .geography: "globe.europe.africa"
         case .status(let status): status.systemImage
         }
     }

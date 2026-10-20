@@ -74,7 +74,8 @@ enum LibraryBackupFixtures {
         tierRawValue: String? = nil,
         genreIDs: [UUID] = [],
         seasons: [LibraryBackupArchive.SeasonRecord] = [],
-        coverData: Data? = nil
+        coverData: Data? = nil,
+        countryCodes: [String]? = nil
     ) -> LibraryBackupArchive.MovieRecord {
         LibraryBackupArchive.MovieRecord(
             id: id,
@@ -91,7 +92,8 @@ enum LibraryBackupFixtures {
             updatedAt: timestamp,
             genreIDs: genreIDs,
             seasons: seasons,
-            coverData: coverData
+            coverData: coverData,
+            countryCodes: countryCodes
         )
     }
 

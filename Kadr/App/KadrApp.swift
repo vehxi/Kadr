@@ -25,6 +25,7 @@ struct KadrApp: App {
         WindowGroup {
             LibraryView()
                 .environment(\.locale, appLanguage.locale)
+                .educaRoot()
                 .task {
                     try? await cleanupOrphanedCovers()
                 }
@@ -38,6 +39,7 @@ struct KadrApp: App {
         Settings {
             SettingsView(updateController: updateController)
                 .environment(\.locale, appLanguage.locale)
+                .educaRoot()
         }
         .modelContainer(modelContainer)
     }

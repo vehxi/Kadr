@@ -27,6 +27,7 @@ struct MovieEditorView: View {
     @State private var rating: Int?
     @State private var synopsis: String
     @State private var selectedGenreIDs: Set<UUID>
+    @State private var selectedCountryCodes: Set<String>
     @State private var pendingCoverData: Data?
     @State private var removesExistingCover = false
     @State private var seasonEpisodeCounts: [Int]
@@ -59,6 +60,7 @@ struct MovieEditorView: View {
         _rating = State(initialValue: movie?.rating)
         _synopsis = State(initialValue: movie?.synopsis ?? "")
         _selectedGenreIDs = State(initialValue: Set(movie?.genres.map(\.id) ?? []))
+        _selectedCountryCodes = State(initialValue: Set(movie?.countryCodes ?? []))
         let episodeCounts = movie?.sortedSeasons.map { $0.episodes.count } ?? []
         _seasonEpisodeCounts = State(initialValue: episodeCounts.isEmpty ? [10] : episodeCounts)
     }
@@ -72,10 +74,12 @@ struct MovieEditorView: View {
                 }
                 .padding(32)
             }
-            Divider()
+            EducaDivider()
             footer
         }
+        .background(EducaColor.panel)
         .frame(minWidth: 860, idealWidth: 940, minHeight: 600, idealHeight: 680)
+        .presentationSizing(.fitted)
         .fileImporter(
             isPresented: $showsFileImporter,
             allowedContentTypes: [.image],
@@ -117,7 +121,7 @@ struct MovieEditorView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(EducaPosterButtonStyle())
             .focused($coverButtonIsFocused)
             .overlay {
                 if coverButtonIsFocused {
@@ -156,7 +160,7 @@ struct MovieEditorView: View {
                         .frame(width: 40, height: 40)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(EducaButtonStyle(kind: .icon))
                 .help("Paste")
                 .accessibilityLabel("Paste")
 
@@ -168,18 +172,16 @@ struct MovieEditorView: View {
                             .frame(width: 40, height: 40)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(EducaButtonStyle(kind: .icon))
                     .help("Remove Cover")
                     .accessibilityLabel("Remove Cover")
                 }
             }
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 5)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .foregroundStyle(EducaColor.secondaryText)
 
             Text("Choose, drop, or paste an image.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(EducaColor.secondaryText)
                 .multilineTextAlignment(.center)
         }
     }
@@ -188,15 +190,14 @@ struct MovieEditorView: View {
     private var coverPreview: some View {
         if let data = pendingCoverData, let image = NSImage(data: data) {
             GeometryReader { geometry in
-                Image(nsImage: image)
-                    .resizable()
-                    .scaledToFill()
+                FillingPosterImage(image: image)
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .background(EducaColor.raised)
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .strokeBorder(.primary.opacity(0.08))
+                            .strokeBorder(EducaColor.border)
                     }
             }
         } else if !removesExistingCover {
@@ -210,8 +211,7 @@ struct MovieEditorView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
                 Text(localized(movie == nil ? "Add Title" : "Edit Title"))
-                    .font(.title2.weight(.semibold))
-                    .tracking(-0.25)
+                    .educaScreenTitle()
 
                 Spacer()
 
@@ -224,7 +224,7 @@ struct MovieEditorView: View {
                         .frame(width: 40, height: 40)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(EducaButtonStyle(kind: .icon))
                 .help(localized(isFavorite ? "Remove from Favorites" : "Add to Favorites"))
                 .accessibilityLabel(localized(isFavorite ? "Remove from Favorites" : "Add to Favorites"))
                 .accessibilityValue(localized(isFavorite ? "Favorite" : "Not Favorite"))
@@ -267,6 +267,12 @@ struct MovieEditorView: View {
 
             genreSelector
                 .padding(.top, 22)
+
+            VStack(alignment: .leading, spacing: 9) {
+                sectionTitle("Production Countries")
+                ProductionCountrySelector(selection: $selectedCountryCodes)
+            }
+            .padding(.top, 22)
 
             if mediaKind == .series {
                 seriesEditor
@@ -311,7 +317,7 @@ struct MovieEditorView: View {
                         Text(status.titleKey)
                         Image(systemName: "chevron.up.chevron.down")
                             .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                     }
                     .font(.subheadline.weight(.medium))
                     .contentShape(Rectangle())
@@ -326,7 +332,7 @@ struct MovieEditorView: View {
             .padding(.leading, 14)
             .padding(.trailing, 8)
             .frame(minHeight: 48)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(EducaFieldSurface())
 
         }
     }
@@ -336,11 +342,11 @@ struct MovieEditorView: View {
             sectionTitle("Genres")
             if genres.isEmpty {
                 Text("Add genres in Settings.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
             } else {
                 if selectedGenres.isEmpty {
                     Text("No genres selected.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(EducaColor.secondaryText)
                 } else {
                     FlowLayout(spacing: 7) {
                         ForEach(selectedGenres) { genre in
@@ -348,13 +354,14 @@ struct MovieEditorView: View {
                                 .font(.caption.weight(.medium))
                                 .padding(.horizontal, 9)
                                 .padding(.vertical, 5)
-                                .background(.quaternary, in: Capsule())
+                                .background(EducaColor.secondaryButton, in: Capsule())
                         }
                     }
                 }
 
                 HStack(spacing: 10) {
                     Button {
+                        genreSearchText = ""
                         showsGenrePicker = true
                     } label: {
                         Label {
@@ -363,17 +370,31 @@ struct MovieEditorView: View {
                             Image(systemName: selectedGenres.isEmpty ? "plus" : "slider.horizontal.3")
                         }
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(EducaButtonStyle())
                     .focused($genrePickerButtonIsFocused)
                     .popover(isPresented: $showsGenrePicker, arrowEdge: .bottom) {
                         genrePicker
+                            .environment(\.locale, locale)
+                    }
+                    .transaction(value: showsGenrePicker) { transaction in
+                        // Keep the macOS 27 NSPopover teardown outside animated CA commits.
+                        if #available(macOS 27, *) {
+                            transaction.disablesAnimations = true
+                        }
                     }
                     .accessibilityHint("Opens a searchable list of genres.")
+                    .onChange(of: showsGenrePicker) { _, isPresented in
+                        guard !isPresented else { return }
+                        Task { @MainActor in
+                            await Task.yield()
+                            genrePickerButtonIsFocused = true
+                        }
+                    }
 
                     if !selectedGenres.isEmpty {
                         Text("\(selectedGenreIDs.count) selected")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                             .monospacedDigit()
                     }
                 }
@@ -384,11 +405,11 @@ struct MovieEditorView: View {
     private var genrePicker: some View {
         VStack(spacing: 0) {
             TextField("Search Genres", text: $genreSearchText)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(EducaTextFieldStyle())
                 .focused($genreSearchIsFocused)
                 .padding(12)
 
-            Divider()
+            EducaDivider()
 
             if filteredGenres.isEmpty {
                 ContentUnavailableView(
@@ -406,14 +427,15 @@ struct MovieEditorView: View {
                     .frame(minHeight: 28)
                 }
                 .listStyle(.inset)
+                .scrollContentBackground(.hidden)
             }
 
-            Divider()
+            EducaDivider()
 
             HStack {
                 Text("\(selectedGenreIDs.count) selected")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(EducaColor.secondaryText)
                     .monospacedDigit()
                 Spacer()
                 Button("Done") {
@@ -424,12 +446,12 @@ struct MovieEditorView: View {
             .padding(12)
         }
         .frame(width: 320, height: 400)
-        .onAppear {
+        .background(EducaColor.panel)
+        .onExitCommand { showsGenrePicker = false }
+        .task {
+            await Task.yield()
+            guard !Task.isCancelled else { return }
             genreSearchIsFocused = true
-        }
-        .onDisappear {
-            genreSearchText = ""
-            genrePickerButtonIsFocused = true
         }
     }
 
@@ -475,7 +497,7 @@ struct MovieEditorView: View {
                         Text("Seasons")
                         Spacer()
                         Text(seasonEpisodeCounts.count, format: .number)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(EducaColor.secondaryText)
                             .monospacedDigit()
                     }
                 }
@@ -483,14 +505,14 @@ struct MovieEditorView: View {
                 .frame(minHeight: 44)
 
                 ForEach(seasonEpisodeCounts.indices, id: \.self) { index in
-                    Divider()
+                    EducaDivider()
                         .padding(.leading, 12)
                     Stepper(value: episodeCountBinding(for: index), in: 1...100) {
                         HStack {
                             Text("Season \(index + 1)")
                             Spacer()
                             Text("\(seasonEpisodeCounts[index]) episodes")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(EducaColor.secondaryText)
                                 .monospacedDigit()
                         }
                     }
@@ -498,26 +520,20 @@ struct MovieEditorView: View {
                     .frame(minHeight: 44)
                 }
             }
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(EducaFieldSurface())
         }
     }
 
     private func sectionTitle(_ key: LocalizedStringKey) -> some View {
         Text(key)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
+            .font(EducaType.label)
+            .tracking(0.8)
+            .foregroundStyle(EducaColor.secondaryText)
             .textCase(.uppercase)
     }
 
     private func editorFieldSurface(isFocused: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-            .fill(.quaternary)
-            .overlay {
-                if isFocused {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.accentColor, lineWidth: 2)
-                }
-            }
+        EducaFieldSurface(isFocused: isFocused)
     }
 
     private var footer: some View {
@@ -531,18 +547,22 @@ struct MovieEditorView: View {
             Button {
                 attemptSave()
             } label: {
-                if movie == nil {
+                if isSaving {
+                    ProgressView().controlSize(.small)
+                        .tint(EducaColor.primaryButtonText)
+                        .accessibilityLabel("Saving…")
+                } else if movie == nil {
                     Text("Add Title")
                 } else {
                     Text("Save")
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(EducaButtonStyle(kind: .primary))
             .keyboardShortcut(.defaultAction)
             .disabled(!isValid || isSaving)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, EducaSpace.page)
+        .padding(.vertical, EducaSpace.lg)
     }
 
     private var hasCover: Bool {
@@ -737,7 +757,8 @@ struct MovieEditorView: View {
                     rating: rating,
                     synopsis: synopsis,
                     coverFilename: coverFilename,
-                    genres: selectedGenres
+                    genres: selectedGenres,
+                    countryCodes: Array(selectedCountryCodes)
                 )
                 syncSeriesStructure(for: movie)
             } else {
@@ -751,7 +772,8 @@ struct MovieEditorView: View {
                     rating: rating,
                     synopsis: synopsis,
                     coverFilename: coverFilename,
-                    genres: selectedGenres
+                    genres: selectedGenres,
+                    countryCodes: Array(selectedCountryCodes)
                 )
                 modelContext.insert(newMovie)
                 syncSeriesStructure(for: newMovie)

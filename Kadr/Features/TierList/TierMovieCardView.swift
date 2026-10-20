@@ -25,18 +25,17 @@ struct TierMovieCardView: View {
 
                 Text(movie.title)
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(EducaColor.text)
                     .lineLimit(2)
                     .frame(width: 96, alignment: .leading)
             }
             .contentShape(Rectangle())
-            .scaleEffect(isHovering && !reduceMotion ? 1.025 : 1)
             .animation(
-                reduceMotion ? nil : .easeOut(duration: 0.16),
+                reduceMotion ? nil : EducaMotion.feedback,
                 value: isHovering
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(EducaPosterButtonStyle())
         .onHover { isHovering = $0 }
         .draggable(movie.id.uuidString) {
             PosterArtwork(

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import Testing
 
 #if SWIFT_PACKAGE
@@ -9,6 +10,49 @@ import Testing
 
 @Suite("Library backup decoding")
 struct LibraryBackupServiceTests {
+    @Test("Archives without country fields remain readable")
+    @MainActor
+    func readsOldCountries() throws {
+        let old = LibraryBackupFixtures.archive(movies: [LibraryBackupFixtures.movie()])
+        let data = try LibraryBackupFixtures.encoded(old)
+        let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
+        let records = try #require(plist["movies"] as? [[String: Any]])
+        #expect(records.first?["countryCodes"] == nil)
+        #expect(try LibraryBackupService.decode(data: data).movies.first?.countryCodes == nil)
+    }
+
+    @Test("Country identifiers are validated", arguments: [["XX"], ["JP", "JP"], ["jp"]])
+    @MainActor
+    func rejectsCountryValues(codes: [String]) throws {
+        try expectDecodeError(.invalidValues, archive: LibraryBackupFixtures.archive(
+            movies: [LibraryBackupFixtures.movie(countryCodes: codes)]
+        ))
+    }
+
+    @Test("Countries survive export and restoration in an isolated library")
+    @MainActor
+    func countryRoundTrip() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("kadr-backup-countries-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let covers = CoverStore(directoryURL: directory)
+        let source = try PersistenceController.makeContainer(inMemory: true)
+        let movie = Movie(title: "Coproduction", status: .watched, isFavorite: true, rating: 4, countryCodes: ["JP", "DE"])
+        source.mainContext.insert(movie)
+        try source.mainContext.save()
+        let document = try await LibraryBackupService.makeDocument(context: source.mainContext, coverStore: covers)
+        let archive = try LibraryBackupService.decode(data: document.data)
+        #expect(archive.movies.first?.countryCodes == ["DE", "JP"])
+        let target = try PersistenceController.makeContainer(inMemory: true)
+        try await LibraryBackupService.restore(archive, context: target.mainContext, coverStore: covers)
+        let restored = try #require(target.mainContext.fetch(FetchDescriptor<Movie>()).first)
+        #expect(restored.countryCodes == ["DE", "JP"])
+        #expect(restored.id == movie.id)
+        #expect(restored.rating == 4)
+        #expect(restored.isFavorite)
+        #expect(restored.status == .watched)
+    }
+
     @Test("Decodes a valid archive")
     @MainActor
     func decodesValidArchive() throws {
