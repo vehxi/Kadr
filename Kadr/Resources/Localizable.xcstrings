@@ -4,21 +4,6 @@
     "" : {
 
     },
-    "System" : {
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Системная" } }
-      }
-    },
-    "Light" : {
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Светлая" } }
-      }
-    },
-    "Dark" : {
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Тёмная" } }
-      }
-    },
     "%@ Tier" : {
       "localizations" : {
         "ru" : {
@@ -647,6 +632,16 @@
         }
       }
     },
+    "Dark" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тёмная"
+          }
+        }
+      }
+    },
     "Dark Theme" : {
       "localizations" : {
         "ru" : {
@@ -926,6 +921,7 @@
       }
     },
     "Follow your Mac or choose a light or dark appearance." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -996,11 +992,22 @@
       }
     },
     "Language" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Язык"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Светлая"
           }
         }
       }
@@ -1026,6 +1033,7 @@
       }
     },
     "Make It Yours" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1678,6 +1686,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хранилище"
+          }
+        }
+      }
+    },
+    "System" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системная"
           }
         }
       }

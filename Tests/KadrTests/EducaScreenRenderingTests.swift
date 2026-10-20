@@ -52,15 +52,23 @@ struct EducaScreenRenderingTests {
                 name: "\(name)-settings-checking", size: CGSize(width: 680, height: 240), scheme: scheme, container: emptyContainer, directory: directory)
             try await render(GenreSettingsView(), name: "\(name)-settings-genres", size: CGSize(width: 680, height: 560), scheme: scheme, container: container, directory: directory)
             try await render(LibraryView(), name: "\(name)-library-sidebar", size: CGSize(width: 1080, height: 760), scheme: scheme, container: container, directory: directory)
+            try verifySidebarReflection(directory.appendingPathComponent("\(name)-library-sidebar.png"), expected: false)
+            try await render(LibraryView(initialSelection: .tierList), name: "\(name)-tiers-sidebar", size: CGSize(width: 1080, height: 760), scheme: scheme, container: container, directory: directory)
+            try verifySidebarReflection(directory.appendingPathComponent("\(name)-tiers-sidebar.png"), expected: true)
             try await render(HStack(spacing: 0) {
-                EducaSidebarSurface(reduceTransparency: true)
+                EducaSidebarSurface(reduceTransparency: true, reflections: [
+                    SidebarReflection(id: "S", color: .red, frame: CGRect(x: 252, y: 80, width: 88, height: 196))
+                ])
                     .overlay(alignment: .topLeading) { Text("Медиатека · Library").padding(24) }
                     .frame(width: 220)
                 EducaColor.canvas
             }, name: "\(name)-opaque-sidebar-surface", size: CGSize(width: 640, height: 400), scheme: scheme, container: emptyContainer, directory: directory)
+            try verifySidebarReflection(directory.appendingPathComponent("\(name)-opaque-sidebar-surface.png"), expected: false, width: 640)
             try await render(MovieDetailView(movie: movie, onDelete: {}), name: "\(name)-detail", size: CGSize(width: 1_000, height: 600), scheme: scheme, container: container, directory: directory)
             try await render(MovieEditorView(movie: movie), name: "\(name)-editor", size: CGSize(width: 940, height: 680), scheme: scheme, container: container, directory: directory)
             try await render(TierListView(movies: [movie], openMovie: { _ in }), name: "\(name)-tiers", size: CGSize(width: 820, height: 720), scheme: scheme, container: container, directory: directory)
+            try await render(TierListView(movies: [movie], openMovie: { _ in }), name: "\(name)-tiers-all", size: CGSize(width: 820, height: 1650), scheme: scheme, container: container, directory: directory)
+            try verifyTierColors(directory.appendingPathComponent("\(name)-tiers-all.png"), scheme: scheme)
             try await render(MovieCardView(movie: movie, action: {}).frame(width: 240).padding(32), name: "\(name)-card", size: CGSize(width: 304, height: 500), scheme: scheme, container: container, directory: directory)
             try await render(GeographyView(), name: "\(name)-map-narrow", size: CGSize(width: 640, height: 1100), scheme: scheme, container: container, directory: directory)
             try await render(GeographyView(), name: "\(name)-map-wide", size: CGSize(width: 960, height: 840), scheme: scheme, container: container, directory: directory)
@@ -70,6 +78,45 @@ struct EducaScreenRenderingTests {
             try await render(GenreSettingsView(), name: "\(name)-empty-genres", size: CGSize(width: 720, height: 600), scheme: scheme, container: emptyContainer, directory: directory)
         }
         print("Educa visual fixtures: \(directory.path)")
+    }
+
+    /// Check the broad category area, not the thin accent stripe used by the regressed UI.
+    private func verifyTierColors(_ url: URL, scheme: ColorScheme) throws {
+        let bitmap = try #require(NSBitmapImageRep(data: Data(contentsOf: url)))
+        let scale = CGFloat(bitmap.pixelsWide) / 820
+        for tier in MovieTier.allCases {
+            // x=48 is well inside the 88pt label and outside its centered text.
+            let x = Int(48 * scale)
+            let coloredRows = (0..<bitmap.pixelsHigh).filter { y in
+                guard let pixel = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { return false }
+                let (r, g, b) = (pixel.redComponent, pixel.greenComponent, pixel.blueComponent)
+                // Match the hue, not exact RGB: PNG/AppKit color management changes channel values.
+                return switch tier {
+                case .s: r > g + 0.3 && r > b + 0.3 && abs(g - b) < 0.2
+                case .a: r > g + 0.15 && g > b + 0.2
+                case .b: r > 0.7 && g > 0.7 && b < 0.4
+                case .c: g > r + 0.2 && g > b + 0.15
+                case .d: b > r + 0.3 && b > g + 0.15
+                }
+            }.count
+            #expect(CGFloat(coloredRows) >= 160 * scale, "Full-height fill missing for tier \(tier.label) in \(scheme)")
+        }
+    }
+
+    private func verifySidebarReflection(_ url: URL, expected: Bool, width: CGFloat = 1080) throws {
+        let bitmap = try #require(NSBitmapImageRep(data: Data(contentsOf: url)))
+        let scale = CGFloat(bitmap.pixelsWide) / width
+        let x = Int(200 * scale)
+        let reflectedRows = (0..<bitmap.pixelsHigh).filter { y in
+            guard let pixel = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { return false }
+            return pixel.redComponent > pixel.greenComponent + 0.05
+                && pixel.redComponent > pixel.blueComponent + 0.05
+        }.count
+        if expected {
+            #expect(CGFloat(reflectedRows) > 60 * scale, "Tier color should be reflected inside the sidebar")
+        } else {
+            #expect(reflectedRows == 0, "Reflections must be absent outside the tier list or with reduced transparency")
+        }
     }
 
     private func render<V: View>(

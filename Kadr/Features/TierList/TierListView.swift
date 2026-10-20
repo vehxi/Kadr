@@ -74,7 +74,7 @@ struct TierListView: View {
         TierLane(
             title: "—",
             subtitle: String(localized: "Unranked"),
-            color: .secondary,
+            color: nil,
             movies: unrankedMovies,
             openMovie: openMovie,
             move: move,
@@ -136,7 +136,7 @@ struct TierListView: View {
 private struct TierLane: View {
     let title: String
     let subtitle: String
-    let color: Color
+    let color: Color?
     let movies: [Movie]
     let openMovie: (Movie) -> Void
     let move: (Movie, MovieTier?) -> Void
@@ -149,19 +149,29 @@ private struct TierLane: View {
             VStack(spacing: 6) {
                 Text(title)
                     .font(.system(size: 32, weight: .semibold))
-                    .foregroundStyle(EducaColor.text)
+                    .foregroundStyle(color == nil ? EducaColor.text : .black)
 
                 Text(subtitle)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(EducaColor.secondaryText)
+                    .foregroundStyle(color == nil ? EducaColor.secondaryText : .black)
                     .monospacedDigit()
                     .lineLimit(1)
             }
             .frame(width: 88)
             .frame(maxHeight: .infinity)
-            .background(EducaColor.secondaryButton)
-            .overlay(alignment: .leading) {
-                Rectangle().fill(color.opacity(0.6)).frame(width: 3)
+            .background(color ?? EducaColor.secondaryButton)
+            .background {
+                if let color {
+                    GeometryReader { geometry in
+                        Color.clear.preference(
+                            key: SidebarReflectionPreferenceKey.self,
+                            value: [SidebarReflection(
+                                id: title, color: color,
+                                frame: geometry.frame(in: .named(SidebarReflection.coordinateSpace))
+                            )]
+                        )
+                    }
+                }
             }
 
             ScrollView(.horizontal) {
